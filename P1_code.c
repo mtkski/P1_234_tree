@@ -178,6 +178,18 @@ vizShow(FILE *f, int n)   /* produce description of current state in dot languag
   free(Q);
 }
 
+
+void preOrder(node234 v) { 
+  printf("node: %d ", ptr2loc(v, v));
+
+  for (int i = 0; i < 4; i++) {
+    if (v->p[i] != NULL) {
+      preOrder(v->p[i]);
+    }
+  }
+}
+
+
 // global variables
 
 #define SIZE 100 
