@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h> 
@@ -5,25 +6,37 @@
 #include <string.h>
 #include <assert.h>
 
-/* structures */
+
+// structures
 
 typedef struct node234* node234;
 
-struct frac{ /* Stores a fraction */
+struct frac{                                    // Stores a fraction
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wlong-long"
-  unsigned long long int a; /* Numerator */
-  unsigned long long int b; /* Denominator */
+  unsigned long long int a;                     // Numerator
+  unsigned long long int b;                     // Denominator
 #pragma GCC diagnostic pop
 };
 
-struct node234
-{
-  struct frac V[3]; /* Key values */
-  node234 p[4]; /* Pointers */
+struct node234{
+  struct frac V[3];         // Key values
+  node234 p[4];             // Pointers
 };
 
-int ptr2loc(node234 v) /* return index i of A[i] that contains node v */
+
+// global variables 
+
+struct node234 A[20];          // Array A of nodes
+struct node234* root;          // root node 
+
+struct node234 *S;             // Stack of nodes 
+
+
+
+// given functions
+
+int ptr2loc(node234 v)     // return index i of A[i] that contains node v 
 {
   int r;
   r = -1;
@@ -34,7 +47,8 @@ int ptr2loc(node234 v) /* return index i of A[i] that contains node v */
   return (int)r;
 }
 
-void showNode(node234 v) /* prints node*/
+
+void showNode(node234 v)    // prints node
 {
   int f;
   int k;
@@ -49,15 +63,13 @@ void showNode(node234 v) /* prints node*/
     printf("%llu/%llu ", v->V[k].a, v->V[k].b);
     k++;
   }
+  
   printf("\n");
 
 }
 
 
-// debugging functions
-
-void
-structLoad(void)  /* load a config directly to array A*/
+void structLoad(void)          // load a config directly to array A
 {
   int i;
 #pragma GCC diagnostic push
@@ -71,11 +83,15 @@ structLoad(void)  /* load a config directly to array A*/
   char *line = (char*)malloc(len*sizeof(char));
 
   line[0] = '#';
-  while('#' == line[0]) getline(&line, &len, stdin);
-  tok = strtok(line, " ");
-  tok = strtok(NULL, " ");
-  sscanf(tok, "%d", &i);
-  S = NULL;
+  
+  while('#' == line[0])          
+    getline(&line, &len, stdin);
+  
+  tok = strtok(line, " ");         
+  tok = strtok(NULL, " ");        
+  sscanf(tok, "%d", &i);        
+  S = NULL;                         
+
   if(-1 != i)
     S = &A[i];
 
@@ -83,11 +99,11 @@ structLoad(void)  /* load a config directly to array A*/
   tok = strtok(NULL, " ");
   sscanf(tok, "%d", &i);
   root = NULL;
+  
   if(-1 != i)
     root = &A[i];
 
-  while(-1 != getline(&line, &len, stdin) &&
-	'X' != line[0]){
+  while(-1 != getline(&line, &len, stdin) && 'X' != line[0]){
     char *tok = strtok(line, " ");
 
     if(0 == strcmp("node:", tok)){
@@ -100,30 +116,35 @@ structLoad(void)  /* load a config directly to array A*/
         tok = strtok(NULL, " ");
         sscanf(tok, "%llu", &j);
         A[i].p[k] = NULL;
+        
         if(-1 != j)
           A[i].p[k] = &A[j];
 
-        if(3 == k) break;
+        if(3 == k) 
+          break;
 
         tok = strtok(NULL, "/");
         sscanf(tok, "%llu", &j);
         A[i].V[k].a = j;
+
         tok = strtok(NULL, " ");
         sscanf(tok, "%llu", &j);
         A[i].V[k].b = j;
+
         k++;
             }
     }
+
   }
   free(line);
 }
 
 
 void  
-vizShow(FILE *f, int n)   /* produce description of current state in dot language */
+vizShow(FILE *f, int n)          // produce description of current state in dot language
 {
   int i;
-  node234 *Q = calloc(n+1, sizeof(node234)); /* Queue of nodes to print */
+  node234 *Q = calloc(n+1, sizeof(node234));  // Queue of nodes to print 
   int in = 0;
   int out = 0;
 
@@ -133,7 +154,7 @@ vizShow(FILE *f, int n)   /* produce description of current state in dot languag
   Q[in] = root;
   in++;
 
-  while(NULL != Q[out]){ /* Non-empty Queue */
+  while(NULL != Q[out]){                      // Non-empty Queue 
     i = ptr2loc(Q[out]);
     fprintf(f, "A%d [label=\"{<h> A[%d] |{<p0> %llu/%llu |<p1> %llu/%llu |<p2> %llu/%llu}}\"]\n",
 	    i, i,
@@ -143,6 +164,7 @@ vizShow(FILE *f, int n)   /* produce description of current state in dot languag
 	    );
 
     i = 0;
+
     while(NULL != Q[out]->p[i] && i < 4){
       Q[in] = Q[out]->p[i];
       in++;
@@ -155,17 +177,19 @@ vizShow(FILE *f, int n)   /* produce description of current state in dot languag
   out = 0;
   Q[in] = root;
   in++;
-  while(NULL != Q[out]){ /* Non-empty Queue */
+
+  while(NULL != Q[out]){                      // Non-empty Queue 
     i = 0;
+
     while(NULL != Q[out]->p[i] && i < 4){
       if(3 == i)
-	fprintf(f, "A%d:p2:se -> A%d:h:n\n",
-		ptr2loc(Q[out]),
-		ptr2loc(Q[out]->p[i]));
+        fprintf(f, "A%d:p2:se -> A%d:h:n\n",
+        ptr2loc(Q[out]),
+        ptr2loc(Q[out]->p[i]));
       else
-	fprintf(f, "A%d:p%d:sw -> A%d:h:n\n",
-		ptr2loc(Q[out]), i,
-		ptr2loc(Q[out]->p[i]));
+        fprintf(f, "A%d:p%d:sw -> A%d:h:n\n",
+        ptr2loc(Q[out]), i,
+        ptr2loc(Q[out]->p[i]));
 
       Q[in] = Q[out]->p[i];
       in++;
@@ -180,8 +204,12 @@ vizShow(FILE *f, int n)   /* produce description of current state in dot languag
 
 
 
+// implemented functions
+
+
+
 void preOrder(node234 v) { 
-  printf("node: %d ", ptr2loc(v, v));
+  printf("node: %d ", ptr2loc(v));
 
   for (int i = 0; i < 4; i++) {
     if (v->p[i] != NULL) {
@@ -233,29 +261,27 @@ struct node234* search_234(struct node234* root, struct frac target) {
   return search_234(root->p[i], target); // Recur to the appropriate subtree
 }
 
-// global variables
+int main(){
 
-#define SIZE 100 
-int A[SIZE];          /* Array A of nodes*/
+  structLoad();
 
-// main function
-
-void main(){
-
-  /* printing final configuration and location of node S and root */
+  // printing final configuration and location of node S and root 
 
   printf("Final configuration:\n");
   printf("S: %d ", ptr2loc(S));
   printf("root: %d \n", ptr2loc(root));
 
-  #ifndef NDEBUG
+
+  // debugging code, will be removed by preprocessor in mooshak: 
+  /* 
+  #ifndef NDEBUG 
         sprintf(fname, "tree%.3d.dot", fc);
         fistr = fopen(fname, "w");
         vizShow(fistr, n);
         fclose(fistr);
         fc++;
-  #endif /* NDEBUG */
-
+  #endif 
+  */
 
 }
 
