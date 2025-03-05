@@ -179,6 +179,7 @@ vizShow(FILE *f, int n)   /* produce description of current state in dot languag
 }
 
 
+
 void preOrder(node234 v) { 
   printf("node: %d ", ptr2loc(v, v));
 
@@ -189,6 +190,48 @@ void preOrder(node234 v) {
   }
 }
 
+/* Function to compute the greatest common divisor using Euclidean algorithm */
+unsigned long long gcd(unsigned long long a, unsigned long long b) {
+  while (b != 0) {
+      unsigned long long temp = b;
+      b = a % b;
+      a = temp;
+  }
+  return a;
+}
+
+/* Function to compare two fractions using the Euclidean algorithm */
+int compare_frac(struct frac f1, struct frac f2) {
+  unsigned long long gcd1 = gcd(f1.a, f1.b);
+  unsigned long long gcd2 = gcd(f2.a, f2.b);
+  
+  f1.a /= gcd1;
+  f1.b /= gcd1;
+  f2.a /= gcd2;
+  f2.b /= gcd2;
+  
+  unsigned long long lhs = f1.a * f2.b;
+  unsigned long long rhs = f2.a * f1.b;
+  
+  if (lhs < rhs) return -1;
+  if (lhs > rhs) return 1;
+  return 0;
+}
+
+/* Search function for the 2-3-4 tree */
+struct node234* search_234(struct node234* root, struct frac target) {
+  if (root == NULL) return NULL;
+  
+  int i;
+  for (i = 0; i < 3; i++) {
+      if (root->V[i].b == 0) break; // Stop at the first empty fraction slot
+      int cmp = compare_frac(target, root->V[i]);
+      if (cmp == 0) return root; // Found the fraction
+      if (cmp < 0) break; // Target should be in the left subtree
+  }
+  
+  return search_234(root->p[i], target); // Recur to the appropriate subtree
+}
 
 // global variables
 
