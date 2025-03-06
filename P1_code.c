@@ -27,7 +27,7 @@ struct node234{
 
 // global variables 
 
-struct node234 A[20];          // Array A of nodes
+node234 A;          // Array A of nodes
 struct node234* root;          // root node 
 
 struct node234 *S;             // Stack of nodes 
@@ -202,11 +202,7 @@ vizShow(FILE *f, int n)          // produce description of current state in dot 
   free(Q);
 }
 
-
-
 // implemented functions
-
-
 
 void preOrder(node234 v) { 
   printf("node: %d ", ptr2loc(v));
@@ -261,15 +257,92 @@ struct node234* search_234(struct node234* root, struct frac target) {
   return search_234(root->p[i], target); // Recur to the appropriate subtree
 }
 
-int main(){
+void process_file(const char* filename) {
+  FILE* file = fopen(filename, "r");
+  if (!file) {
+      perror("Error opening file");
+      return;
+  }
+  
+  char line[256];
+  while (fgets(line, sizeof(line), file)) {
+      if (line[0] == '#') {
+          printf("%s", line); // Print comment lines
+          continue;
+      }
+      
+      char command;
+      struct frac f;
+      int index;
+      
+      if (sscanf(line, " %c", &command) != 1) continue;
+      
+      switch (command) {
+          case 'S':
+              if (sscanf(line, "S %d", &index) == 1) {
+                  printf("Show node at index %d\n", index);
+                  // Call showNode(index);
+              }
+              break;
+          case 'F':
+              if (sscanf(line, "F %llu/%llu", &f.a, &f.b) == 2) {
+                  printf("Searching for fraction %llu/%llu\n", f.a, f.b);
+                  // Call search function and return index
+              }
+              break;
+          case 'N':
+              printf("Printing tree in inorder\n");
+              // Call inorder print function
+              break;
+          case 'P':
+              printf("Printing tree in preorder\n");
+              // Call preorder print function
+              break;
+          case 'I':
+              if (sscanf(line, "I %llu/%llu", &f.a, &f.b) == 2) {
+                  printf("Inserting fraction %llu/%llu\n", f.a, f.b);
+                  // Call insert function
+              }
+              break;
+          case 'D':
+              if (sscanf(line, "D %llu/%llu", &f.a, &f.b) == 2) {
+                  printf("Deleting fraction %llu/%llu\n", f.a, f.b);
+                  // Call delete function
+              }
+              break;
+          case 'L':
+              printf("Loading tree configuration\n");
+              structLoad();
+              break;
+          case 'X':
+              printf("Terminating program\n");
+              fclose(file);
+              return;
+          default:
+              printf("Unknown command: %c\n", command);
+      }
+  }
+  
+  fclose(file);
+}
 
-  structLoad();
+
+int main(){
+  const char* filename = "P1-tests/T03/input";
+  freopen(filename, "r", stdin);
+  size_t len = 256;
+  char *line = (char*)malloc(len*sizeof(char));
+  int tree_size = getline(&line, &len, stdin);
+  A = calloc(tree_size, sizeof(struct node234));
+  getchar();
+  process_file(filename);
+  // structLoad();
 
   // printing final configuration and location of node S and root 
 
-  printf("Final configuration:\n");
-  printf("S: %d ", ptr2loc(S));
-  printf("root: %d \n", ptr2loc(root));
+  // printf("Final configuration:\n");
+  // printf("S: %d ", ptr2loc(S));
+  // printf("root: %d \n", ptr2loc(root));
 
 
   // debugging code, will be removed by preprocessor in mooshak: 
