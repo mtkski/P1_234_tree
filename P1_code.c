@@ -27,11 +27,11 @@ struct node234{
 
 // global variables 
 
-node234 A;          // Array A of nodes
+node234 A;                     // Array A of nodes
 struct node234* root;          // root node 
 
 struct node234 *S;             // Stack of nodes 
-
+int top = -1;
 
 
 // given functions
@@ -46,7 +46,6 @@ int ptr2loc(node234 v)     // return index i of A[i] that contains node v
 
   return (int)r;
 }
-
 
 void showNode(node234 v)    // prints node
 {
@@ -67,7 +66,6 @@ void showNode(node234 v)    // prints node
   printf("\n");
 
 }
-
 
 void structLoad(void)          // load a config directly to array A
 {
@@ -139,9 +137,7 @@ void structLoad(void)          // load a config directly to array A
   free(line);
 }
 
-
-void  
-vizShow(FILE *f, int n)          // produce description of current state in dot language
+void vizShow(FILE *f, int n)          // produce description of current state in dot language
 {
   int i;
   node234 *Q = calloc(n+1, sizeof(node234));  // Queue of nodes to print 
@@ -202,17 +198,8 @@ vizShow(FILE *f, int n)          // produce description of current state in dot 
   free(Q);
 }
 
-// implemented functions
 
-void preOrder(node234 v) { 
-  printf("node: %d ", ptr2loc(v));
-
-  for (int i = 0; i < 4; i++) {
-    if (v->p[i] != NULL) {
-      preOrder(v->p[i]);
-    }
-  }
-}
+// help functions
 
 /* Function to compute the greatest common divisor using Euclidean algorithm */
 unsigned long long gcd(unsigned long long a, unsigned long long b) {
@@ -326,24 +313,245 @@ void process_file(const char* filename) {
   fclose(file);
 }
 
+// ------------------------
+
+void pushS(struct node234 * v) {
+
+    if (top >= 0){
+      v->p[3] = &S[top];
+    }
+
+    S[++top] = *v;
+}
+
+struct node234 popS() {
+    return S[top--];
+}
+
+
+int compareFrac(const void *a, const void *b) {
+    struct frac *f1 = (struct frac *)a;
+    struct frac *f2 = (struct frac *)b;
+    
+    double val1 = (double)f1->a / f1->b;
+    double val2 = (double)f2->a / f2->b;
+    
+    return (val1 > val2) - (val1 < val2);
+}
+
+void splitNode(node234 v, struct frac f){
+  /*
+  struct node234 sibling = popS();
+  int v_index = ptr2loc(v);
+
+  struct frac values[4] = { v->V[0], v->V[1], v->V[2], f };
+  qsort(values, 4, sizeof(struct frac), compareFrac);
+
+  v->V[0] = values[0];
+  v->V[1] = values[1];
+
+  sibling.V[0] = values[3];
+
+  values[2];  //give to parent
+  */
+  printf("Spliting node %d\n", ptr2loc(v));
+
+}
+
+node234 joinNode(node234 v1, node234 v2){
+  /*
+  code
+  */
+  printf("Joining nodes %d%d\n", ptr2loc(v1), ptr2loc(v2));
+  return v1;
+
+}
+
+
+// implemented functions
+
+int searchFrac(struct frac f){
+
+  bool found = false;
+  struct node234 *v = root;
+
+  int next;
+
+  while (!found){
+
+    next = 3;
+
+    for (int i = 0; i < 3; i++){ 
+
+      if (f.a/f.b == v->V[i].a/v->V[i].b){
+        found = true;
+        return ptr2loc(v);
+
+      } else if (f.a/f.b < v->V[i].a/v->V[i].b){
+        next = i;
+        break;
+
+      }
+    }
+
+    if (v->p[next] != NULL){
+      v = v->p[next];
+    } else {
+      break;
+    }
+
+  }
+  
+  return -1;
+};
+
+void inOrder(node234 v){
+  
+};
+
+void preOrder(node234 v) { 
+  printf("%d ", ptr2loc(v));
+
+  for (int i = 0; i < 4; i++) {
+    if (v->p[i] != NULL) {
+      preOrder(v->p[i]);
+    }
+  }
+}
+
+int insert(struct frac f){
+  return -1;
+};
+
+int delete(struct frac f){
+  
+  int index = searchFrac(f);
+
+  return -1;
+
+};
+
 
 int main(){
-  const char* filename = "P1-tests/T03/input";
-  freopen(filename, "r", stdin);
+  
+  //const char* filename = "P1-tests/T03/input";
+  //freopen(filename, "r", stdin);
+
   size_t len = 256;
   char *line = (char*)malloc(len*sizeof(char));
-  int tree_size = getline(&line, &len, stdin);
-  A = calloc(tree_size, sizeof(struct node234));
-  getchar();
-  process_file(filename);
-  // structLoad();
+  
+  int tree_size; 
+  char command;
 
-  // printing final configuration and location of node S and root 
+  int index;
+  struct frac f;
 
-  // printf("Final configuration:\n");
-  // printf("S: %d ", ptr2loc(S));
-  // printf("root: %d \n", ptr2loc(root));
+  getline(&line, &len, stdin);
+  sscanf(line, "%d", &tree_size);  
+  
+  A = calloc(tree_size, sizeof(node234));
+  root = &A[tree_size-1];
+  S = (struct node234*)malloc(tree_size * sizeof(struct node234));
 
+  for (int i = 0; i < tree_size; i++){
+    pushS(&A[i]);
+  }
+
+  while (sscanf(line, " %c", &command) != -1) {
+  
+    getline(&line, &len, stdin);
+    sscanf(line, "%c", &command); 
+
+    switch (command) {
+
+            case 'S':
+                
+                if (sscanf(line, "S %d", &index) == 1) {
+                    //printf("Showing node ‰llu", index);
+                    showNode(&A[index]);
+                }
+
+                break;
+
+            case 'F':
+                
+                if (sscanf(line, "F %llu/%llu", &f.a, &f.b) == 2) {
+                    //printf("The fraction %llu/%llu can be found at index: ", &f.a, &f.b);
+                    printf("%d\n", searchFrac(f));
+
+                }
+
+                break;
+
+            case 'N':
+                
+                inOrder(root);
+                printf("\n");
+
+                break;
+
+            case 'P':
+
+                preOrder(root);
+                printf("\n");
+
+                break;
+
+            case 'I':
+
+                if (sscanf(line, "I %llu/%llu", &f.a, &f.b) == 2) {
+                    //printf("Inserting fraction %llu/%llu\n", f.a, f.b);
+                    index = insert(f);
+                    printf("%d\n", index);
+                }
+
+                break;
+
+            case 'D':
+
+                if (sscanf(line, "D %llu/%llu", &f.a, &f.b) == 2) {
+                    //printf("Deleting fraction %llu/%llu\n", f.a, f.b);
+                    index = delete(f);
+                    printf("%d\n", index);
+                }
+
+                break;
+
+            case 'L':
+
+                //printf("\nLoading tree configuration\n");
+                structLoad();
+                break;
+
+            case 'X':
+                // printing final configuration: location of node S and root + all nodes
+                printf("Final configuration:\n");
+                printf("S: %d ", ptr2loc(S));
+                printf("root: %d \n", ptr2loc(root));
+
+                for (int i = 0; i < tree_size; i++){
+                  showNode(&A[i]);
+                }
+
+                printf("X\n");
+                return 0;
+
+                break;
+
+            case '#':
+
+                printf("%s", line);
+                break;
+
+            default:
+
+                printf("\nUnknown command: %c\n", command);
+                break;
+        }
+  }
+
+  //printf("%c\n", command);
+  //process_file(filename);
 
   // debugging code, will be removed by preprocessor in mooshak: 
   /* 
