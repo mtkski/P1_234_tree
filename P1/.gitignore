@@ -1,4 +1,7 @@
 *.json
+/.vscode
+/.idea
+/.DS_Store
 
 # Object files
 *.o
