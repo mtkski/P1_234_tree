@@ -25,8 +25,8 @@ int find(Subset subsets[], int i) {
     return subsets[i].parent;
 }
 
-void unionSets(Subset subsets[], int x, int y) {
-    // Union by rank -> smaller rank tree gets attached to the larger rank tree
+void unionSets(Subset subsets[], int x, int y) {  
+    /*Union by rank -> smaller rank tree gets attached to the larger rank tree*/ 
     int rootX = find(subsets, x);
     int rootY = find(subsets, y);
 
@@ -42,17 +42,18 @@ void unionSets(Subset subsets[], int x, int y) {
 
 void kruskalMST(Graph* graph, int budget) {
     int V = graph->V;
-    Edge result[graph->V]; // MST is max the size of the graph
+    Edge* result = (Edge*)malloc(V * sizeof(Edge)); /* Allocate memory for MST */
     int e = 0;  
     int i = 0; 
     int totalCost = 0;  
+    int subsetSize = V;
+    int v ;
+    Subset* subsets = (Subset*)malloc(V * sizeof(Subset)); /* Max the size of the graph */
 
     qsort(graph->edges, graph->E, sizeof(graph->edges[0]), compareEdges);
 
-    Subset subsets[graph->V]; // Max the size of the graph
-    int subsetSize = V;
-
-    for (int v = 0; v < V; v++) {
+    
+    for (v=0; v < V; v++) {
         subsets[v].parent = v;
         subsets[v].rank = 0;
     }
@@ -63,31 +64,36 @@ void kruskalMST(Graph* graph, int budget) {
         int x = find(subsets, nextEdge.src);
         int y = find(subsets, nextEdge.dest);
 
-        // Cycle = same parent, so x == y
+        /*Cycle = same parent, so x == y*/ 
         if (x != y && (totalCost + nextEdge.weight <= budget)) {
 
             result[e++] = nextEdge;
             totalCost += nextEdge.weight;
             unionSets(subsets, x, y);
-            subsetSize--; // Decrease the number of subsets every time we unionize them
+            subsetSize--; /*Decrease the number of subsets every time we unionize them*/
 
         }
     }
+
+    free(subsets);
+    free(result);
 
     printf("%i\n",totalCost);
     printf("%i\n",subsetSize);
 }
 
-int main() {
+int main(void) {
     Graph graph;
     int budget;
+    int i;
 
     scanf("%d", &graph.V);
     scanf("%d", &budget);
     scanf("%d", &graph.E);
 
     graph.edges = (Edge*)malloc(graph.E * sizeof(Edge));
-    for (int i = 0; i < graph.E; i++) {
+    
+    for (i = 0; i < graph.E; i++) {
         scanf("%d %d %d", &graph.edges[i].src, &graph.edges[i].dest, &graph.edges[i].weight);
         graph.edges[i].src--;  
         graph.edges[i].dest--;
