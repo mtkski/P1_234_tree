@@ -1,0 +1,255 @@
+Letter 1
+LZ-Block  1
+Leaf node: 2 head: 0 sdep: 51 child: -1 brother: -1 slink: -1
+Letter 0
+LZ-Block  0
+Leaf node: 3 head: 1 sdep: 50 child: -1 brother: 2 slink: -1
+Letter 1
+Letter 1
+LZ-Block 1 1
+Internal node: 4 head: 0 sdep: 1 child: 2 brother: -1 slink: -1
+Leaf node: 5 head: 2 sdep: 49 child: -1 brother: 2 slink: -1
+Letter 0
+Letter 1
+Letter 0
+Internal node: 6 head: 0 sdep: 3 child: 2 brother: -1 slink: -1
+Leaf node: 7 head: 3 sdep: 48 child: -1 brother: 2 slink: -1
+LZ-Block 01 0
+Internal node: 8 head: 1 sdep: 2 child: 3 brother: 4 slink: -1
+Leaf node: 9 head: 4 sdep: 47 child: -1 brother: 3 slink: -1
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Internal node: 10 head: 0 sdep: 6 child: 2 brother: -1 slink: -1
+Leaf node: 11 head: 5 sdep: 46 child: -1 brother: 2 slink: -1
+Internal node: 12 head: 1 sdep: 5 child: 3 brother: -1 slink: -1
+Leaf node: 13 head: 6 sdep: 45 child: -1 brother: 3 slink: -1
+LZ-Block 1101 1
+Internal node: 14 head: 2 sdep: 4 child: 5 brother: 6 slink: -1
+Leaf node: 15 head: 7 sdep: 44 child: -1 brother: 5 slink: -1
+Letter 0
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 0
+Internal node: 16 head: 0 sdep: 11 child: 2 brother: -1 slink: -1
+Leaf node: 17 head: 8 sdep: 43 child: -1 brother: 2 slink: -1
+Internal node: 18 head: 1 sdep: 10 child: 3 brother: -1 slink: -1
+Leaf node: 19 head: 9 sdep: 42 child: -1 brother: 3 slink: -1
+Internal node: 20 head: 2 sdep: 9 child: 5 brother: -1 slink: -1
+Leaf node: 21 head: 10 sdep: 41 child: -1 brother: 5 slink: -1
+Internal node: 22 head: 3 sdep: 8 child: 7 brother: 10 slink: -1
+Leaf node: 23 head: 11 sdep: 40 child: -1 brother: 7 slink: -1
+LZ-Block 0101101 0
+Internal node: 24 head: 4 sdep: 7 child: 9 brother: 12 slink: -1
+Leaf node: 25 head: 12 sdep: 39 child: -1 brother: 9 slink: -1
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Internal node: 26 head: 0 sdep: 19 child: 2 brother: -1 slink: -1
+Leaf node: 27 head: 13 sdep: 38 child: -1 brother: 2 slink: -1
+Internal node: 28 head: 1 sdep: 18 child: 3 brother: -1 slink: -1
+Leaf node: 29 head: 14 sdep: 37 child: -1 brother: 3 slink: -1
+Internal node: 30 head: 2 sdep: 17 child: 5 brother: -1 slink: -1
+Leaf node: 31 head: 15 sdep: 36 child: -1 brother: 5 slink: -1
+Internal node: 32 head: 3 sdep: 16 child: 7 brother: -1 slink: -1
+Leaf node: 33 head: 16 sdep: 35 child: -1 brother: 7 slink: -1
+Internal node: 34 head: 4 sdep: 15 child: 9 brother: -1 slink: -1
+Leaf node: 35 head: 17 sdep: 34 child: -1 brother: 9 slink: -1
+Internal node: 36 head: 5 sdep: 14 child: 11 brother: 16 slink: -1
+Leaf node: 37 head: 18 sdep: 33 child: -1 brother: 11 slink: -1
+Internal node: 38 head: 6 sdep: 13 child: 13 brother: 18 slink: -1
+Leaf node: 39 head: 19 sdep: 32 child: -1 brother: 13 slink: -1
+LZ-Block 110110101101 1
+Internal node: 40 head: 7 sdep: 12 child: 15 brother: 20 slink: -1
+Leaf node: 41 head: 20 sdep: 31 child: -1 brother: 15 slink: -1
+Letter 0
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 1
+Letter 0
+Letter 1
+Letter 0
+Letter 1
+Letter $
+Internal node: 42 head: 0 sdep: 29 child: 2 brother: -1 slink: -1
+Leaf node: 43 head: 21 sdep: 30 child: -1 brother: 2 slink: -1
+Internal node: 44 head: 1 sdep: 28 child: 3 brother: -1 slink: -1
+Leaf node: 45 head: 22 sdep: 29 child: -1 brother: 3 slink: -1
+Internal node: 46 head: 2 sdep: 27 child: 5 brother: -1 slink: -1
+Leaf node: 47 head: 23 sdep: 28 child: -1 brother: 5 slink: -1
+Internal node: 48 head: 3 sdep: 26 child: 7 brother: -1 slink: -1
+Leaf node: 49 head: 24 sdep: 27 child: -1 brother: 7 slink: -1
+Internal node: 50 head: 4 sdep: 25 child: 9 brother: -1 slink: -1
+Leaf node: 51 head: 25 sdep: 26 child: -1 brother: 9 slink: -1
+Internal node: 52 head: 5 sdep: 24 child: 11 brother: -1 slink: -1
+Leaf node: 53 head: 26 sdep: 25 child: -1 brother: 11 slink: -1
+Internal node: 54 head: 6 sdep: 23 child: 13 brother: -1 slink: -1
+Leaf node: 55 head: 27 sdep: 24 child: -1 brother: 13 slink: -1
+Internal node: 56 head: 7 sdep: 22 child: 15 brother: -1 slink: -1
+Leaf node: 57 head: 28 sdep: 23 child: -1 brother: 15 slink: -1
+Internal node: 58 head: 8 sdep: 21 child: 17 brother: 26 slink: -1
+Leaf node: 59 head: 29 sdep: 22 child: -1 brother: 17 slink: -1
+Internal node: 60 head: 9 sdep: 20 child: 19 brother: 28 slink: -1
+Leaf node: 61 head: 30 sdep: 21 child: -1 brother: 19 slink: -1
+Internal node: 62 head: 10 sdep: 19 child: 21 brother: 30 slink: -1
+Leaf node: 63 head: 31 sdep: 20 child: -1 brother: 21 slink: -1
+Internal node: 64 head: 11 sdep: 18 child: 23 brother: 32 slink: -1
+Leaf node: 65 head: 32 sdep: 19 child: -1 brother: 23 slink: -1
+LZ-Block 01011010110110101 $
+Internal node: 66 head: 12 sdep: 17 child: 25 brother: 34 slink: -1
+Leaf node: 67 head: 33 sdep: 18 child: -1 brother: 25 slink: -1
+Internal node: 68 head: 0 sdep: 16 child: 26 brother: -1 slink: -1
+Leaf node: 69 head: 34 sdep: 17 child: -1 brother: 26 slink: -1
+Internal node: 70 head: 1 sdep: 15 child: 28 brother: -1 slink: -1
+Leaf node: 71 head: 35 sdep: 16 child: -1 brother: 28 slink: -1
+Internal node: 72 head: 2 sdep: 14 child: 30 brother: -1 slink: -1
+Leaf node: 73 head: 36 sdep: 15 child: -1 brother: 30 slink: -1
+Internal node: 74 head: 3 sdep: 13 child: 32 brother: -1 slink: -1
+Leaf node: 75 head: 37 sdep: 14 child: -1 brother: 32 slink: -1
+Internal node: 76 head: 4 sdep: 12 child: 34 brother: -1 slink: -1
+Leaf node: 77 head: 38 sdep: 13 child: -1 brother: 34 slink: -1
+Internal node: 78 head: 5 sdep: 11 child: 36 brother: 16 slink: -1
+Leaf node: 79 head: 39 sdep: 12 child: -1 brother: 36 slink: -1
+Internal node: 80 head: 6 sdep: 10 child: 38 brother: 18 slink: -1
+Leaf node: 81 head: 40 sdep: 11 child: -1 brother: 38 slink: -1
+Internal node: 82 head: 7 sdep: 9 child: 40 brother: 20 slink: -1
+Leaf node: 83 head: 41 sdep: 10 child: -1 brother: 40 slink: -1
+Internal node: 84 head: 0 sdep: 8 child: 16 brother: -1 slink: -1
+Leaf node: 85 head: 42 sdep: 9 child: -1 brother: 16 slink: -1
+Internal node: 86 head: 1 sdep: 7 child: 18 brother: -1 slink: -1
+Leaf node: 87 head: 43 sdep: 8 child: -1 brother: 18 slink: -1
+Internal node: 88 head: 2 sdep: 6 child: 20 brother: -1 slink: -1
+Leaf node: 89 head: 44 sdep: 7 child: -1 brother: 20 slink: -1
+Internal node: 90 head: 3 sdep: 5 child: 22 brother: 10 slink: -1
+Leaf node: 91 head: 45 sdep: 6 child: -1 brother: 22 slink: -1
+Internal node: 92 head: 4 sdep: 4 child: 24 brother: 12 slink: -1
+Leaf node: 93 head: 46 sdep: 5 child: -1 brother: 24 slink: -1
+Leaf node: 94 head: 47 sdep: 4 child: -1 brother: 90 slink: -1
+Leaf node: 95 head: 48 sdep: 3 child: -1 brother: 92 slink: -1
+Leaf node: 96 head: 49 sdep: 2 child: -1 brother: 14 slink: -1
+Leaf node: 97 head: 50 sdep: 1 child: -1 brother: 8 slink: -1
+8
+Final version
+node: 0 head: 0 sdep: 0 child: 97 brother: -1 slink: 1
+node: 1 head: 0 sdep: -1 child: 0 brother: -1 slink: -1
+node: 2 head: 0 sdep: 51 child: -1 brother: -1 slink: -1
+node: 3 head: 1 sdep: 50 child: -1 brother: -1 slink: -1
+node: 4 head: 0 sdep: 1 child: 96 brother: -1 slink: 0
+node: 5 head: 2 sdep: 49 child: -1 brother: -1 slink: -1
+node: 6 head: 0 sdep: 3 child: 94 brother: -1 slink: 8
+node: 7 head: 3 sdep: 48 child: -1 brother: -1 slink: -1
+node: 8 head: 1 sdep: 2 child: 95 brother: 4 slink: 4
+node: 9 head: 4 sdep: 47 child: -1 brother: -1 slink: -1
+node: 10 head: 0 sdep: 6 child: 78 brother: -1 slink: 12
+node: 11 head: 5 sdep: 46 child: -1 brother: -1 slink: -1
+node: 12 head: 1 sdep: 5 child: 80 brother: -1 slink: 14
+node: 13 head: 6 sdep: 45 child: -1 brother: -1 slink: -1
+node: 14 head: 2 sdep: 4 child: 82 brother: 6 slink: 6
+node: 15 head: 7 sdep: 44 child: -1 brother: -1 slink: -1
+node: 16 head: 0 sdep: 11 child: 58 brother: -1 slink: 18
+node: 17 head: 8 sdep: 43 child: -1 brother: -1 slink: -1
+node: 18 head: 1 sdep: 10 child: 60 brother: -1 slink: 20
+node: 19 head: 9 sdep: 42 child: -1 brother: -1 slink: -1
+node: 20 head: 2 sdep: 9 child: 62 brother: -1 slink: 22
+node: 21 head: 10 sdep: 41 child: -1 brother: -1 slink: -1
+node: 22 head: 3 sdep: 8 child: 64 brother: -1 slink: 24
+node: 23 head: 11 sdep: 40 child: -1 brother: -1 slink: -1
+node: 24 head: 4 sdep: 7 child: 66 brother: -1 slink: 10
+node: 25 head: 12 sdep: 39 child: -1 brother: -1 slink: -1
+node: 26 head: 0 sdep: 19 child: 27 brother: -1 slink: 28
+node: 27 head: 13 sdep: 38 child: -1 brother: 42 slink: -1
+node: 28 head: 1 sdep: 18 child: 29 brother: -1 slink: 30
+node: 29 head: 14 sdep: 37 child: -1 brother: 44 slink: -1
+node: 30 head: 2 sdep: 17 child: 31 brother: -1 slink: 32
+node: 31 head: 15 sdep: 36 child: -1 brother: 46 slink: -1
+node: 32 head: 3 sdep: 16 child: 33 brother: -1 slink: 34
+node: 33 head: 16 sdep: 35 child: -1 brother: 48 slink: -1
+node: 34 head: 4 sdep: 15 child: 35 brother: -1 slink: 36
+node: 35 head: 17 sdep: 34 child: -1 brother: 50 slink: -1
+node: 36 head: 5 sdep: 14 child: 37 brother: -1 slink: 38
+node: 37 head: 18 sdep: 33 child: -1 brother: 52 slink: -1
+node: 38 head: 6 sdep: 13 child: 39 brother: -1 slink: 40
+node: 39 head: 19 sdep: 32 child: -1 brother: 54 slink: -1
+node: 40 head: 7 sdep: 12 child: 41 brother: -1 slink: 16
+node: 41 head: 20 sdep: 31 child: -1 brother: 56 slink: -1
+node: 42 head: 0 sdep: 29 child: 43 brother: -1 slink: 44
+node: 43 head: 21 sdep: 30 child: -1 brother: 2 slink: -1
+node: 44 head: 1 sdep: 28 child: 45 brother: -1 slink: 46
+node: 45 head: 22 sdep: 29 child: -1 brother: 3 slink: -1
+node: 46 head: 2 sdep: 27 child: 47 brother: -1 slink: 48
+node: 47 head: 23 sdep: 28 child: -1 brother: 5 slink: -1
+node: 48 head: 3 sdep: 26 child: 49 brother: -1 slink: 50
+node: 49 head: 24 sdep: 27 child: -1 brother: 7 slink: -1
+node: 50 head: 4 sdep: 25 child: 51 brother: -1 slink: 52
+node: 51 head: 25 sdep: 26 child: -1 brother: 9 slink: -1
+node: 52 head: 5 sdep: 24 child: 53 brother: -1 slink: 54
+node: 53 head: 26 sdep: 25 child: -1 brother: 11 slink: -1
+node: 54 head: 6 sdep: 23 child: 55 brother: -1 slink: 56
+node: 55 head: 27 sdep: 24 child: -1 brother: 13 slink: -1
+node: 56 head: 7 sdep: 22 child: 57 brother: -1 slink: 58
+node: 57 head: 28 sdep: 23 child: -1 brother: 15 slink: -1
+node: 58 head: 8 sdep: 21 child: 59 brother: 68 slink: 60
+node: 59 head: 29 sdep: 22 child: -1 brother: 17 slink: -1
+node: 60 head: 9 sdep: 20 child: 61 brother: 70 slink: 62
+node: 61 head: 30 sdep: 21 child: -1 brother: 19 slink: -1
+node: 62 head: 10 sdep: 19 child: 63 brother: 72 slink: 64
+node: 63 head: 31 sdep: 20 child: -1 brother: 21 slink: -1
+node: 64 head: 11 sdep: 18 child: 65 brother: 74 slink: 66
+node: 65 head: 32 sdep: 19 child: -1 brother: 23 slink: -1
+node: 66 head: 12 sdep: 17 child: 67 brother: 76 slink: 68
+node: 67 head: 33 sdep: 18 child: -1 brother: 25 slink: -1
+node: 68 head: 0 sdep: 16 child: 69 brother: -1 slink: 70
+node: 69 head: 34 sdep: 17 child: -1 brother: 26 slink: -1
+node: 70 head: 1 sdep: 15 child: 71 brother: -1 slink: 72
+node: 71 head: 35 sdep: 16 child: -1 brother: 28 slink: -1
+node: 72 head: 2 sdep: 14 child: 73 brother: -1 slink: 74
+node: 73 head: 36 sdep: 15 child: -1 brother: 30 slink: -1
+node: 74 head: 3 sdep: 13 child: 75 brother: -1 slink: 76
+node: 75 head: 37 sdep: 14 child: -1 brother: 32 slink: -1
+node: 76 head: 4 sdep: 12 child: 77 brother: -1 slink: 78
+node: 77 head: 38 sdep: 13 child: -1 brother: 34 slink: -1
+node: 78 head: 5 sdep: 11 child: 79 brother: 84 slink: 80
+node: 79 head: 39 sdep: 12 child: -1 brother: 36 slink: -1
+node: 80 head: 6 sdep: 10 child: 81 brother: 86 slink: 82
+node: 81 head: 40 sdep: 11 child: -1 brother: 38 slink: -1
+node: 82 head: 7 sdep: 9 child: 83 brother: 88 slink: 84
+node: 83 head: 41 sdep: 10 child: -1 brother: 40 slink: -1
+node: 84 head: 0 sdep: 8 child: 85 brother: -1 slink: 86
+node: 85 head: 42 sdep: 9 child: -1 brother: 16 slink: -1
+node: 86 head: 1 sdep: 7 child: 87 brother: -1 slink: 88
+node: 87 head: 43 sdep: 8 child: -1 brother: 18 slink: -1
+node: 88 head: 2 sdep: 6 child: 89 brother: -1 slink: 90
+node: 89 head: 44 sdep: 7 child: -1 brother: 20 slink: -1
+node: 90 head: 3 sdep: 5 child: 91 brother: 10 slink: 92
+node: 91 head: 45 sdep: 6 child: -1 brother: 22 slink: -1
+node: 92 head: 4 sdep: 4 child: 93 brother: 12 slink: 6
+node: 93 head: 46 sdep: 5 child: -1 brother: 24 slink: -1
+node: 94 head: 47 sdep: 4 child: -1 brother: 90 slink: -1
+node: 95 head: 48 sdep: 3 child: -1 brother: 92 slink: -1
+node: 96 head: 49 sdep: 2 child: -1 brother: 14 slink: -1
+node: 97 head: 50 sdep: 1 child: -1 brother: 8 slink: -1
