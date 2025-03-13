@@ -31,8 +31,6 @@ node234 A;                     // Array A of nodes
 struct node234* root;          // root node 
 
 struct node234 *S;             // Stack of nodes 
-int top = -1;
-
 
 // given functions
 
@@ -130,7 +128,7 @@ void structLoad(void)          // load a config directly to array A
         A[i].V[k].b = j;
 
         k++;
-            }
+        }
     }
 
   }
@@ -315,26 +313,14 @@ void process_file(const char* filename) {
 
 // ------------------------
 
-void pushS(struct node234 * v) {
+int compareFrac(struct frac f1, struct frac f2) {
 
-    if (top >= 0){
-      v->p[3] = &S[top];
+    if (f1.b == 0 || f2.b == 0){
+      return 2;
     }
-
-    S[++top] = *v;
-}
-
-struct node234 popS() {
-    return S[top--];
-}
-
-
-int compareFrac(const void *a, const void *b) {
-    struct frac *f1 = (struct frac *)a;
-    struct frac *f2 = (struct frac *)b;
     
-    double val1 = (double)f1->a / f1->b;
-    double val2 = (double)f2->a / f2->b;
+    double val1 = (double)f1.a / f1.b;
+    double val2 = (double)f2.a / f2.b;
     
     return (val1 > val2) - (val1 < val2);
 }
@@ -374,7 +360,6 @@ int searchFrac(struct frac f){
 
   bool found = false;
   struct node234 *v = root;
-
   int next;
 
   while (!found){
@@ -383,14 +368,15 @@ int searchFrac(struct frac f){
 
     for (int i = 0; i < 3; i++){ 
 
-      if (f.a/f.b == v->V[i].a/v->V[i].b){
+      //printf("Looking for %llu/%llu in node %d, comparing to %llu/%llu\n", f.a, f.b, ptr2loc(v), v->V[i].a, v->V[i].b);
+
+      if (compareFrac(f, v->V[i]) == 0){
         found = true;
         return ptr2loc(v);
 
-      } else if (f.a/f.b < v->V[i].a/v->V[i].b){
+      } else if (compareFrac(f, v->V[i]) == -1 || compareFrac(f, v->V[i]) == 2){
         next = i;
         break;
-
       }
     }
 
@@ -399,13 +385,12 @@ int searchFrac(struct frac f){
     } else {
       break;
     }
-
   }
   
   return -1;
 };
 
-void inOrder(node234 v){
+void inOrder(int tree_size){
   
 };
 
@@ -420,6 +405,21 @@ void preOrder(node234 v) {
 }
 
 int insert(struct frac f){
+
+  if (searchFrac(f) == -1){
+
+    node234 new_node = S;
+    new_node->V[0] = f;
+    new_node->p[3] = NULL;
+    S = S->p[3];
+
+    if (root == NULL){
+      root = new_node;
+    }
+
+    return ptr2loc(new_node);
+  }
+
   return -1;
 };
 
@@ -427,7 +427,7 @@ int delete(struct frac f){
   
   int index = searchFrac(f);
 
-  return -1;
+  return index;
 
 };
 
@@ -450,11 +450,11 @@ int main(){
   sscanf(line, "%d", &tree_size);  
   
   A = calloc(tree_size, sizeof(node234));
-  root = &A[tree_size-1];
-  S = (struct node234*)malloc(tree_size * sizeof(struct node234));
+  S = &A[tree_size-1];
+  root = NULL;
 
-  for (int i = 0; i < tree_size; i++){
-    pushS(&A[i]);
+  for (int i = 1; i < tree_size; i++){
+    A[i].p[3] = &A[i-1];
   }
 
   while (sscanf(line, " %c", &command) != -1) {
@@ -485,14 +485,17 @@ int main(){
 
             case 'N':
                 
-                inOrder(root);
+                if (root != NULL){
+                  inOrder(tree_size);
+                }
                 printf("\n");
 
                 break;
 
             case 'P':
-
-                preOrder(root);
+                if (root != NULL){
+                  preOrder(root);
+                }
                 printf("\n");
 
                 break;
@@ -549,6 +552,10 @@ int main(){
                 break;
         }
   }
+
+  free(A);
+  free(S);
+  free(root);
 
   //printf("%c\n", command);
   //process_file(filename);
