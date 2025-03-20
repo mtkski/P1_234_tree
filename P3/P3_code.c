@@ -9,8 +9,9 @@
 
 typedef struct point* point;
 typedef struct node* node;
-struct node234* root;          // root node 
-char T;
+node root;           // root node 
+char* T;
+point p;
 
 /* lastInternalCreated (global variable to be implemented last) */
 
@@ -68,7 +69,7 @@ bool descendQ(point p, char t){
         
         while (bro != NULL){
 
-            next = T[&bro->head];
+            next = T[bro->head];
 
             if (next == t){
                 return true;
@@ -80,7 +81,7 @@ bool descendQ(point p, char t){
         return false;
 
     } else {                                    // check one character
-        return T[&p->b->head + p->s] == t;
+        return T[p->b->head + p->s] == t;
     }
 
 }
@@ -100,7 +101,21 @@ void descend(point p, char t){
     }
 }
 
-void addLeaf(point p, /* &(root[a]), */int i){
+int addLeaf(point p, node N, int i){
+
+    if (p->a == p->b){
+        node leaf;
+
+    } else {
+        node internal;
+        node leaf;
+
+        internal->child = p->b;
+        p->a->child = internal;
+        internal->child = leaf;
+        leaf->brother = p->b;
+
+    }
 
 }
 
@@ -114,21 +129,21 @@ void suffixLink(point p){
 void main(){
     
     int n;
+    int i = 0;
+    int a = 0;
 
     scanf("%d", n);
     
     T = (char*)malloc(n*sizeof(char));
-    scanf("%s\0", T);
-
-    int i = 0;
+    scanf("%s\0", T);     
 
     while(i < n) {
-        printf("Letter %c\n", "\0" == T[&i] ? "$" : T[&i]);
+        printf("Letter %c\n", "\0" == T[i] ? "$" : T[i]);
         
         while(!DescendQ(p, T[i])) {
-            a += AddLeaf(p, &(root[a]), i);
-            SuffixLink(p);
-            j++;
+            a += addLeaf(p, &(root[a]), i);
+            suffixLink(p);
+            //j++;
         }
 
         Descend(p, T[i]);
