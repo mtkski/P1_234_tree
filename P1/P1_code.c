@@ -325,6 +325,13 @@ int compareFrac(struct frac f1, struct frac f2) {
     return (val1 > val2) - (val1 < val2);
 }
 
+int compareQ(const void* a, const void* b) {
+    const struct frac* f1 = (const struct frac*)a;
+    const struct frac* f2 = (const struct frac*)b;
+    
+    return compareFrac(*f1, *f2);
+}
+
 void splitNode(node234 v, struct frac f){
   /*
   struct node234 sibling = popS();
@@ -406,21 +413,60 @@ void preOrder(node234 v) {
 
 int insert(struct frac f){
 
-  if (searchFrac(f) == -1){
-
-    node234 new_node = S;
-    new_node->V[0] = f;
-    new_node->p[3] = NULL;
+  if (root == NULL){
+    root = S;
     S = S->p[3];
+    root->V[0] = f;
+    root->p[3] = NULL;
 
-    if (root == NULL){
-      root = new_node;
+    return ptr2loc(root);
+
+  } else {
+
+    bool inserted = false;
+    struct node234 *check = root;
+    int next;
+    struct frac upper_bound = f;
+
+    while (!inserted){
+
+      //printf("Trying to insert %llu/%llu in node %d\n", f.a, f.b, ptr2loc(check));
+
+      next = 3;
+
+      for (int i = 0; i < 3; i++){ 
+
+        if (compareFrac(f, check->V[i]) == 2){
+
+          //printf("Value %llu in node %d is empty\n", i, ptr2loc(check));  sort!!
+
+          check->V[i] = f;
+          qsort(check->V, sizeof(check->V) / sizeof(check->V[0]), sizeof(int), compareQ);
+          inserted = true;
+          return ptr2loc(check);
+
+        } else if (compareFrac(upper_bound, check->V[i]) == -1){
+          upper_bound =  check->V[i];
+          next = i;
+        }
+      }
+
+      if (check->p[next] != NULL){
+        check = check->p[next];
+
+      } else {
+
+        struct node234* new_node = S;
+        S = S->p[3];
+        new_node->V[0] = f;
+        new_node->p[3] = NULL;
+
+        inserted = true;
+        return ptr2loc(new_node);
+        break;
+      }
     }
-
-    return ptr2loc(new_node);
   }
-
-  return -1;
 };
 
 int delete(struct frac f){
