@@ -90,12 +90,17 @@ void descend(point p, char t){
 
     if (descendQ(p, t)){
        
-        if (p->a == p->b){                          // move to first location in next branch
+        if (p->a == p->b){                          // if we are in a node: move to first location in next branch 
         
             p->b = p->b->child;
             p->s = 1;
 
-        } else {                                    // increment string depth
+        } else if(p->s + 1 == p->b->sdep){          // if we are at the end of a branch (??? condition might be wrong): move to next node
+
+            p->a = p->b;
+            p->s = 0;
+
+        } else {                                    // else if we are in the middle of a branch: increment string depth, move forward in branch
             p->s += 1;
         }
     }
@@ -106,15 +111,21 @@ int addLeaf(point p, node N, int i){
     if (p->a == p->b){
         node leaf;
 
+        leaf->child = NULL;
+        leaf->slink = NULL;
+
+        return 1;
+
     } else {
         node internal;
         node leaf;
 
-        internal->child = p->b;
         p->a->child = internal;
+        //internal->child = p->b;
         internal->child = leaf;
         leaf->brother = p->b;
 
+        return 1;
     }
 
 }
@@ -126,27 +137,27 @@ void suffixLink(point p){
 
 // main function
 
-void main(){
+int main(){
     
     int n;
     int i = 0;
     int a = 0;
 
-    scanf("%d", n);
+    scanf("%d", &n);
     
     T = (char*)malloc(n*sizeof(char));
-    scanf("%s\0", T);     
+    scanf("%s", T);     
 
     while(i < n) {
-        printf("Letter %c\n", "\0" == T[i] ? "$" : T[i]);
+        printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);
         
-        while(!DescendQ(p, T[i])) {
+        while(!descendQ(p, T[i])) {
             a += addLeaf(p, &(root[a]), i);
             suffixLink(p);
             //j++;
         }
 
-        Descend(p, T[i]);
+        descend(p, T[i]);
         i++;
     }
 
