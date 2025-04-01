@@ -9,6 +9,7 @@
 
 typedef struct point* point;
 typedef struct node* node;
+int n;
 node root;           // root node 
 char *T;
 point p;
@@ -110,29 +111,32 @@ int addLeaf(point p, node N, int i){
 
     if (p->a == p->b){
 
-        N->head = i;
+        N->head = i - p->s;
         N->child = NULL;
-        N->slink = NULL;
+        N->slink = NULL;    
+        N->sdep = n + 1 - N->head;
 
-        printf("Leaf");
+        printf("Leaf ");
         shownode(N);
 
         return 1;
 
     } else {
-        node internal = (node)malloc(sizeof(struct node));;
+        node internal = (node)malloc(sizeof(struct node));
 
         internal->head = p->b->head;
         p->a->child = internal;
         //internal->child = p->b;
         internal->child = N;
+        internal->sdep = p->s;
 
-        N->head = i;
+        N->head = i - p->s;
         N->brother = p->b;
+        N->sdep = n + 1 - N->head;
 
-        printf("Internal");
+        printf("Internal ");
         shownode(internal);
-        printf("Leaf");
+        printf("Leaf ");
         shownode(N);
 
         return 1;
@@ -149,20 +153,29 @@ void suffixLink(point p){
 
 int main(){
     
-    int n;
-    int i = 0;
-    int a = 0;
+    int i = 0;              /* position in string T */
+    int a = 2;              /* position in root array */
 
     scanf("%d", &n);
     
     T = (char*)malloc(n*sizeof(char));
     scanf("%s", T);     
 
-    root = calloc(n, sizeof(struct node));
+    root = calloc(n + 2, sizeof(struct node));
     p = (point)malloc(sizeof(struct point));
 
+    root[0].slink = &root[1];       /* the slink of the root is the sentinel*/
+    root[1].child = &root[0];       /* we can descend from the sentinel to the root */
+
+    p->a = &root[0];
+    p->b = &root[0];
+
     while(i < n) {
+
         printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);
+
+        p->a = &root[1];    /* go to sentinel */
+        p->b = &root[1];
         
         while(!descendQ(p, T[i])) {
             a += addLeaf(p, &(root[a]), i);
