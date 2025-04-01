@@ -160,10 +160,10 @@ int main(void){
     T = (char*)malloc(n*sizeof(char));
     scanf("%s", T);     
 
-    root = calloc(n + 2, sizeof(struct node));
+    root = calloc(n + 2, sizeof(struct node)); /* Whole size of the tree */
     p = (point)malloc(sizeof(struct point));
 
-    root[0].slink = &root[1];       /* the slink of the root is the sentinel*/
+    root[0].slink = &root[1];       /* the suffix link of the root is the sentinel */
     root[1].child = &root[0];       /* we can descend from the sentinel to the root */
 
     p->a = &root[0];
