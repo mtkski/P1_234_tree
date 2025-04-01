@@ -95,8 +95,10 @@ void descend(point p, char t){
     if (p->a == p->b){               /* if we are in a node, set b to next node */
         p->b = p->b->child;          
     }
+
+    printf(" next pos: %d  sdep of next node: %d  sdep of node above: %d\n", p->s + 1, p->b->sdep, p->a->sdep == -1);
     
-    if(p->s + 1 == p->b->sdep || p->b->sdep == 0){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
+    if(p->s + 1 == p->b->sdep || p->a->sdep == -1){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
 
         p->a = p->b;
         p->s = 0;
@@ -104,6 +106,11 @@ void descend(point p, char t){
     } else {                         /* else if we are in the middle of a branch: increment string depth, move forward in branch */
         p->s += 1;
     }
+
+    printf(" descended to: ");
+    printf("a: %d  ", ptr2loc(p->a, root));
+    printf("b: %d  ", ptr2loc(p->b, root));
+    printf("s: %d\n", p->s);
 }
 
 
@@ -196,6 +203,12 @@ int main(){
 
         descend(p, T[i]);
         i++;
+
+        if (p->a != &root[0] && p->b != &root[0]){
+            p->a = &root[1];                          /* go to sentinel */
+            p->b = &root[1];
+            p->s = 0;
+        }
     }
 
     printf("Final version\n");
