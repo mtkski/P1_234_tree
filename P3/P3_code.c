@@ -63,7 +63,7 @@ void shownode(node v)
 
 bool descendQ(point p, char t){ 
 
-    if (p->a == p->b){                          // if we are in a node then check child then brothers
+    if (p->a == p->b){                  /* if we are in a node then check child then brothers */
         
         node bro = p->b->child;
         char next;
@@ -71,17 +71,20 @@ bool descendQ(point p, char t){
         while (bro != NULL){
 
             next = T[bro->head];
-
-            if (next == t){
+            
+            if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
+                return true;
+            } else if (next == t){         /* next head is t, i.e we can descend with t */
                 return true;
             } else {
-                bro = bro->brother;
+                bro = bro->brother;        /* check brothers */
             }
         }
 
         return false;
 
-    } else {                                    // check one character
+    } else {                            /* if we are in an edge then check next character */
+        
         return T[p->b->head + p->s] == t;
     }
 
@@ -89,29 +92,30 @@ bool descendQ(point p, char t){
 
 void descend(point p, char t){
 
-    if (descendQ(p, t)){
-       
-        if (p->a == p->b){                          // if we are in a node: move to first location in next branch 
-        
-            p->b = p->b->child;
-            p->s = 1;
+    if (p->a == p->b){               /* if we are in a node, set b to next node */
+        p->b = p->b->child;          
+    }
+    
+    if(p->s + 1 == p->b->sdep || p->b->sdep == 0){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
 
-        } else if(p->s + 1 == p->b->sdep){          // if we are at the end of a branch (??? condition might be wrong): move to next node
+        p->a = p->b;
+        p->s = 0;
 
-            p->a = p->b;
-            p->s = 0;
-
-        } else {                                    // else if we are in the middle of a branch: increment string depth, move forward in branch
-            p->s += 1;
-        }
+    } else {                         /* else if we are in the middle of a branch: increment string depth, move forward in branch */
+        p->s += 1;
     }
 }
 
-int addLeaf(point p, node N, int i){
+
+int addLeaf(point p, int a, int j){
+
+    node N = &(root[a]);
 
     if (p->a == p->b){
 
-        N->head = i - p->s;
+        p->a->child = N;
+
+        N->head = j;
         N->child = NULL;
         N->slink = NULL;    
         N->sdep = n + 1 - N->head;
@@ -122,7 +126,8 @@ int addLeaf(point p, node N, int i){
         return 1;
 
     } else {
-        node internal = (node)malloc(sizeof(struct node));
+        
+        node internal = &(root[a+1]);
 
         internal->head = p->b->head;
         p->a->child = internal;
@@ -130,7 +135,7 @@ int addLeaf(point p, node N, int i){
         internal->child = N;
         internal->sdep = p->s;
 
-        N->head = i - p->s;
+        N->head = j;
         N->brother = p->b;
         N->sdep = n + 1 - N->head;
 
@@ -139,12 +144,16 @@ int addLeaf(point p, node N, int i){
         printf("Leaf ");
         shownode(N);
 
-        return 1;
+        return 2;
     }
 
 }
 
 void suffixLink(point p){
+
+    if (p->a == p->b && p->a->child == NULL){
+        p->a->slink;
+    } // ???
 
 }
 
@@ -153,8 +162,9 @@ void suffixLink(point p){
 
 int main(){
     
+    int j;
     int i = 0;              /* position in string T */
-    int a = 2;              /* position in root array */
+    int a = 2;              /* position in root array, start after root node and sentinel */
 
     scanf("%d", &n);
     
@@ -163,24 +173,25 @@ int main(){
 
     root = calloc(n + 2, sizeof(struct node));
     p = (point)malloc(sizeof(struct point));
-
-    root[0].slink = &root[1];       /* the slink of the root is the sentinel*/
+    
+    root[0].slink = &root[1];       /* the slink of the root is the sentinel */
     root[1].child = &root[0];       /* we can descend from the sentinel to the root */
+    root[1].sdep = -1;
+    
+    p->a = &root[i];                /* go to root */
+    p->b = &root[i];
+    p->s = 0;
 
-    p->a = &root[0];
-    p->b = &root[0];
-
-    while(i < n) {
+    while(i < n + 1) {
 
         printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);
 
-        p->a = &root[1];    /* go to sentinel */
-        p->b = &root[1];
+        j = i;
         
         while(!descendQ(p, T[i])) {
-            a += addLeaf(p, &(root[a]), i);
+            a += addLeaf(p, a, j);
             suffixLink(p);
-            //j++;
+            j++;
         }
 
         descend(p, T[i]);
