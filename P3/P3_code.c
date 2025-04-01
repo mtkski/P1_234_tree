@@ -10,7 +10,7 @@
 typedef struct point* point;
 typedef struct node* node;
 node root;           // root node 
-char* T;
+char *T;
 point p;
 
 /* lastInternalCreated (global variable to be implemented last) */
@@ -109,21 +109,31 @@ void descend(point p, char t){
 int addLeaf(point p, node N, int i){
 
     if (p->a == p->b){
-        node leaf;
 
-        leaf->child = NULL;
-        leaf->slink = NULL;
+        N->head = i;
+        N->child = NULL;
+        N->slink = NULL;
+
+        printf("Leaf");
+        shownode(N);
 
         return 1;
 
     } else {
-        node internal;
-        node leaf;
+        node internal = (node)malloc(sizeof(struct node));;
 
+        internal->head = p->b->head;
         p->a->child = internal;
         //internal->child = p->b;
-        internal->child = leaf;
-        leaf->brother = p->b;
+        internal->child = N;
+
+        N->head = i;
+        N->brother = p->b;
+
+        printf("Internal");
+        shownode(internal);
+        printf("Leaf");
+        shownode(N);
 
         return 1;
     }
@@ -148,6 +158,9 @@ int main(){
     T = (char*)malloc(n*sizeof(char));
     scanf("%s", T);     
 
+    root = calloc(n, sizeof(struct node));
+    p = (point)malloc(sizeof(struct point));
+
     while(i < n) {
         printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);
         
@@ -158,6 +171,14 @@ int main(){
         }
 
         descend(p, T[i]);
+        i++;
+    }
+
+    printf("Final version\n");
+    i = 0;
+
+    while(i < a){
+        shownode(&(root[i]));
         i++;
     }
 
