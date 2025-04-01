@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h> 
-#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
 
@@ -10,7 +9,7 @@
 typedef struct point* point;
 typedef struct node* node;
 int n;
-node root;           // root node 
+node root;           /* root node */
 char *T;
 point p;
 
@@ -56,14 +55,14 @@ void shownode(node v)
     }
 }
 
-// help functions:
+/* help functions:*/
 
 
-// implemented functions:
+/* implemented functions:*/
 
-bool descendQ(point p, char t){ 
+int descendQ(point p, char t){ 
 
-    if (p->a == p->b){                          // if we are in a node then check child then brothers
+    if (p->a == p->b){                          /* if we are in a node then check child then brothers*/
         
         node bro = p->b->child;
         char next;
@@ -73,15 +72,15 @@ bool descendQ(point p, char t){
             next = T[bro->head];
 
             if (next == t){
-                return true;
+                return 1;
             } else {
                 bro = bro->brother;
             }
         }
 
-        return false;
+        return 0;
 
-    } else {                                    // check one character
+    } else {                                    /* check one character */
         return T[p->b->head + p->s] == t;
     }
 
@@ -91,17 +90,17 @@ void descend(point p, char t){
 
     if (descendQ(p, t)){
        
-        if (p->a == p->b){                          // if we are in a node: move to first location in next branch 
+        if (p->a == p->b){                          /* if we are in a node: move to first location in next branch */
         
             p->b = p->b->child;
             p->s = 1;
 
-        } else if(p->s + 1 == p->b->sdep){          // if we are at the end of a branch (??? condition might be wrong): move to next node
+        } else if(p->s + 1 == p->b->sdep){          /* if we are at the end of a branch (??? condition might be wrong): move to next node*/
 
             p->a = p->b;
             p->s = 0;
 
-        } else {                                    // else if we are in the middle of a branch: increment string depth, move forward in branch
+        } else {                                    /* else if we are in the middle of a branch: increment string depth, move forward in branch*/
             p->s += 1;
         }
     }
@@ -126,7 +125,7 @@ int addLeaf(point p, node N, int i){
 
         internal->head = p->b->head;
         p->a->child = internal;
-        //internal->child = p->b;
+        /* internal->child = p->b; */
         internal->child = N;
         internal->sdep = p->s;
 
@@ -149,9 +148,9 @@ void suffixLink(point p){
 }
 
 
-// main function
+/*main function*/ 
 
-int main(){
+int main(void){
     
     int i = 0;              /* position in string T */
     int a = 2;              /* position in root array */
@@ -180,7 +179,7 @@ int main(){
         while(!descendQ(p, T[i])) {
             a += addLeaf(p, &(root[a]), i);
             suffixLink(p);
-            //j++;
+            /*j++;*/
         }
 
         descend(p, T[i]);

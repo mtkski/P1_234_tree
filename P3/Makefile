@@ -2,6 +2,7 @@ all : P3
 
 P3: P3_code.c
 	gcc -o P3 P3_code.c
+	gcc -D NDEBUG -O3 -ansi -pedantic P3_code.c  
 
 T01 : all
 	./P3 < ./P3-tests/T01/input
@@ -17,3 +18,4 @@ T04 : all
 
 clean :
 	rm P3
+	rm *.out
