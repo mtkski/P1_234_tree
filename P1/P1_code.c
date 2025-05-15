@@ -227,21 +227,6 @@ int compare_frac(struct frac f1, struct frac f2) {
   return 0;
 }
 
-/* Search function for the 2-3-4 tree */
-struct node234* search_234(struct node234* root, struct frac target) {
-  if (root == NULL) return NULL;
-  
-  int i;
-  for (i = 0; i < 3; i++) {
-      if (root->V[i].b == 0) break; // Stop at the first empty fraction slot
-      int cmp = compare_frac(target, root->V[i]);
-      if (cmp == 0) return root; // Found the fraction
-      if (cmp < 0) break; // Target should be in the left subtree
-  }
-  
-  return search_234(root->p[i], target); // Recur to the appropriate subtree
-}
-
 void process_file(const char* filename) {
   FILE* file = fopen(filename, "r");
   if (!file) {
@@ -423,47 +408,43 @@ int insert(struct frac f){
 
   } else {
 
-    bool inserted = false;
-    struct node234 *check = root;
-    int next;
-    struct frac upper_bound = f;
+    int inserted = 0;
+    struct node234 *current_node = root;
 
-    while (!inserted){
+    while(!inserted){
 
-      //printf("Trying to insert %llu/%llu in node %d\n", f.a, f.b, ptr2loc(check));
+      if(1==1 ) { // if it's a 4 node
+          
+          if (current_node == root){
+            return 0;
+          }
 
-      next = 3;
-
-      for (int i = 0; i < 3; i++){ 
-
-        if (compareFrac(f, check->V[i]) == 2){
-
-          //printf("Value %llu in node %d is empty\n", i, ptr2loc(check));  sort!!
-
-          check->V[i] = f;
-          qsort(check->V, sizeof(check->V) / sizeof(check->V[0]), sizeof(int), compareQ);
-          inserted = true;
-          return ptr2loc(check);
-
-        } else if (compareFrac(upper_bound, check->V[i]) == -1){
-          upper_bound =  check->V[i];
-          next = i;
-        }
-      }
-
-      if (check->p[next] != NULL){
-        check = check->p[next];
-
+        // Philippe -> split node
+        
+        return 0;
+        
       } else {
 
-        struct node234* new_node = S;
-        S = S->p[3];
-        new_node->V[0] = f;
-        new_node->p[3] = NULL;
+        // Alice -> descend the tree to know where to insert
+        // first will always be filled
+        // node will never be full 
 
-        inserted = true;
-        return ptr2loc(new_node);
-        break;
+        if(compare_frac(f, current_node->V[0]) == -1){            // navigate down first pointer 
+          current_node = current_node->p[0];               
+
+        } else if(current_node->V[1].b == 0){                     // add frac middle space because it is NULL
+          current_node->V[1] = f;
+          inserted = 1;
+          return ptr2loc(current_node);
+
+        } else if (compare_frac(f, current_node->V[1]) == -1){    // navigate down second pointer
+          current_node = current_node->p[1];
+
+        } else if(current_node->V[2].b == 0){                     // add frac right space because it is NULL
+          current_node->V[2] = f;
+          inserted = 1;
+          return ptr2loc(current_node);
+        }
       }
     }
   }
