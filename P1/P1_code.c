@@ -317,11 +317,19 @@ int compareQ(const void* a, const void* b) {
     return compareFrac(*f1, *f2);
 }
 
-void splitNode(node234 c, int i){
+void splitNode(node234 c, int i){ //i is to check what pointer do we split
   // c is the current node
   // we have to move up p[i] to the correct position in the current node c
   if(i == 0){
-    c.V[2] = c.V[1];
+    c->V[2] = c->V[1];
+    c->V[1] = c->V[0];
+    c->V[0] = c->p[0]->V[1];
+
+    
+    S->V[0] = c->p[0]->V[2]; // not correct, we have to rearrange the pointers first
+
+    S = S->p[3];
+    
   }
   
 }
@@ -388,7 +396,7 @@ void preOrder(node234 v) {
 
 int insert(struct frac f){
 
-  if (root == NULL){
+  if (root == NULL){ // first insertion (check if relevant?)
     root = S;
     S = S->p[3];
     root->V[0] = f;
@@ -401,40 +409,42 @@ int insert(struct frac f){
     int inserted = 0;
     struct node234 *current_node = root;
 
+    // check if the root is not a 4 node outside the while loop
+
     while(!inserted){
+      
+      // check for every pointer only we have to descend to it 
 
-      if(1==1 ) { // if it's a 4 node
-          
-          if (current_node == root){
-            return 0;
-          }
+      // Alice -> descend the tree to know where to insert
+      // first will always be filled
+      // we only check every pointer
 
-        // Philippe -> split node
-        
-        return 0;
-        
-      } else {
-
-        // Alice -> descend the tree to know where to insert
-        // first will always be filled
-        // node will never be full 
-
-        if(compare_frac(f, current_node->V[0]) == -1){            // navigate down first pointer 
-          current_node = current_node->p[0];               
-
-        } else if(current_node->V[1].b == 0){                     // add frac middle space because it is NULL
-          current_node->V[1] = f;
-          inserted = 1;
-          return ptr2loc(current_node);
-
-        } else if (compare_frac(f, current_node->V[1]) == -1){    // navigate down second pointer
-          current_node = current_node->p[1];
-
-        } else if(current_node->V[2].b == 0){                     // add frac right space because it is NULL
-          current_node->V[2] = f;
-          inserted = 1;
-          return ptr2loc(current_node);
+      if(compare_frac(f, current_node->V[0]) == -1){            // navigate down p0 
+        if(current_node->p[0]->V[2].b == 0){ // p0 is a 4node
+          splitNode(current_node, 0);
+          continue;                         // going to restart the while loop
         }
+
+        current_node = current_node->p[0];               
+        // p0 case done 
+
+      } else if(current_node->V[1].b == 0){                     // add frac middle space because it is NULL
+        current_node->V[1] = f;
+        inserted = 1;
+        return ptr2loc(current_node);
+
+      } else if (compare_frac(f, current_node->V[1]) == -1){    // navigate down second pointer
+        if(current_node->p[1]->V[2].b == 0){ // p1 is a 4node
+          splitNode(current_node, 1);
+          continue;                         // going to restart the while loop
+        }
+
+        current_node = current_node->p[1];
+
+      } else if(current_node->V[2].b == 0){                     // add frac right space because it is NULL
+        current_node->V[2] = f;
+        inserted = 1;
+        return ptr2loc(current_node);
       }
     }
   }
