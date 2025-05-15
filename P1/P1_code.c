@@ -230,7 +230,7 @@ int compare_frac(struct frac f1, struct frac f2) {
 /* Search function for the 2-3-4 tree */
 struct node234* search_234(struct node234* root, struct frac target) {
   if (root == NULL) return NULL;
-  
+
   int i;
   for (i = 0; i < 3; i++) {
       if (root->V[i].b == 0) break; // Stop at the first empty fraction slot
@@ -332,23 +332,13 @@ int compareQ(const void* a, const void* b) {
     return compareFrac(*f1, *f2);
 }
 
-void splitNode(node234 v, struct frac f){
-  /*
-  struct node234 sibling = popS();
-  int v_index = ptr2loc(v);
-
-  struct frac values[4] = { v->V[0], v->V[1], v->V[2], f };
-  qsort(values, 4, sizeof(struct frac), compareFrac);
-
-  v->V[0] = values[0];
-  v->V[1] = values[1];
-
-  sibling.V[0] = values[3];
-
-  values[2];  //give to parent
-  */
-  printf("Spliting node %d\n", ptr2loc(v));
-
+void splitNode(node234 c, int i){
+  // c is the current node
+  // we have to move up p[i] to the correct position in the current node c
+  if(i == 0){
+    c.V[2] = c.V[1];
+  }
+  
 }
 
 node234 joinNode(node234 v1, node234 v2){
