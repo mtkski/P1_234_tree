@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h> 
-#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
 
@@ -10,7 +9,7 @@
 typedef struct point* point;
 typedef struct node* node;
 int n;
-node root;           // root node 
+node root;           /* root node */
 char *T;
 point p;
 
@@ -56,12 +55,12 @@ void shownode(node v)
     }
 }
 
-// help functions:
+/* help functions:*/
 
 
-// implemented functions:
+/* implemented functions:*/
 
-bool descendQ(point p, char t){ 
+int descendQ(point p, char t){ 
 
     if (p->a == p->b){                  /* if we are in a node then check child then brothers */
         
@@ -81,7 +80,7 @@ bool descendQ(point p, char t){
             }
         }
 
-        return false;
+        return 0;
 
     } else {                            /* if we are in an edge then check next character */
         
@@ -131,7 +130,7 @@ int addLeaf(point p, int a, int j){
 
         internal->head = p->b->head;
         p->a->child = internal;
-        //internal->child = p->b;
+        /* internal->child = p->b; */
         internal->child = N;
         internal->sdep = p->s;
 
@@ -158,9 +157,9 @@ void suffixLink(point p){
 }
 
 
-// main function
+/*main function*/ 
 
-int main(){
+int main(void){
     
     int j;
     int i = 0;              /* position in string T */
@@ -171,7 +170,7 @@ int main(){
     T = (char*)malloc(n*sizeof(char));
     scanf("%s", T);     
 
-    root = calloc(n + 2, sizeof(struct node));
+    root = calloc(n + 2, sizeof(struct node)); /* Whole size of the tree */
     p = (point)malloc(sizeof(struct point));
     
     root[0].slink = &root[1];       /* the slink of the root is the sentinel */
