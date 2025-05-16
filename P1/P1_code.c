@@ -317,19 +317,27 @@ int compareQ(const void* a, const void* b) {
     return compareFrac(*f1, *f2);
 }
 
-void splitNode(node234 c, int i){ //i is to check what pointer do we split
-  // c is the current node
-  // we have to move up p[i] to the correct position in the current node c
+void splitNode(node234 c, int i){ 
+  /*i is to check what pointer do we split
+    c is the current node
+    we have to move up p[i] to the correct position in the current node c */
   if(i == 0){
     c->V[2] = c->V[1];
     c->V[1] = c->V[0];
-    c->V[0] = c->p[0]->V[1];
+    c->V[0] = c->p[0]->V[1]; //here we moved all the values of the current to the right
 
-    
-    S->V[0] = c->p[0]->V[2]; // not correct, we have to rearrange the pointers first
+    c->p[3] = c->p[2];
+    c->p[2] = c->p[1]; /*move the pointers to the right, p0 is already good*/
 
+    c->p[1] = S; /*new node insertion*/
     S = S->p[3];
+    c->p[1]->V[0] = c->p[0]->V[2]; 
     
+    c->p[0]->V[1].a = 0 ;
+    c->p[0]->V[1].b = 0 ;
+
+    c->p[0]->V[2].a = 0 ;
+    c->p[0]->V[2].b = 0 ; /*here we delete everything from p0 (only the value of v0 stays)*/
   }
   
 }
@@ -409,18 +417,36 @@ int insert(struct frac f){
     int inserted = 0;
     struct node234 *current_node = root;
 
-    // check if the root is not a 4 node outside the while loop
+
+    if(current_node->V[2].b != 0){     //root is current_node because before the while loop 
+      root = S;
+      S = S->p[3];
+
+      root->V[0] = current_node->V[1];
+      root->p[0] = current_node;
+
+      root->p[1] = S ;
+      S = S->p[3];
+      root->p[1]->V[0] = current_node->V[2];
+
+      current_node->V[1].a = 0 ;
+      current_node->V[1].b = 0 ;
+
+      current_node->V[2].a = 0 ;
+      current_node->V[2].b = 0 ;
+
+      printf("Splitted %i", ptr2loc(current_node));
+      return ptr2loc(current_node); // return the node that was splitted
+    }
+
 
     while(!inserted){
-      
       // check for every pointer only we have to descend to it 
-
       // Alice -> descend the tree to know where to insert
-      // first will always be filled
-      // we only check every pointer
+      // we only check every pointer, insert inside only leaf nodes
 
-      if(compare_frac(f, current_node->V[0]) == -1){            // navigate down p0 
-        if(current_node->p[0]->V[2].b == 0){ // p0 is a 4node
+      if(compare_frac(f, current_node->V[0]) == -1){  // navigate down p0 
+        if(current_node->p[0]->V[2].b != 0){ // p0 is a 4node
           splitNode(current_node, 0);
           continue;                         // going to restart the while loop
         }
@@ -428,20 +454,20 @@ int insert(struct frac f){
         current_node = current_node->p[0];               
         // p0 case done 
 
-      } else if(current_node->V[1].b == 0){                     // add frac middle space because it is NULL
+      } else if(current_node->V[1].b != 0){                     // add frac middle space because it is NULL
         current_node->V[1] = f;
         inserted = 1;
         return ptr2loc(current_node);
 
       } else if (compare_frac(f, current_node->V[1]) == -1){    // navigate down second pointer
-        if(current_node->p[1]->V[2].b == 0){ // p1 is a 4node
+        if(current_node->p[1]->V[2].b != 0){ // p1 is a 4node
           splitNode(current_node, 1);
           continue;                         // going to restart the while loop
         }
 
         current_node = current_node->p[1];
 
-      } else if(current_node->V[2].b == 0){                     // add frac right space because it is NULL
+      } else if(current_node->V[2].b != 0){                     // add frac right space because it is NULL
         current_node->V[2] = f;
         inserted = 1;
         return ptr2loc(current_node);
