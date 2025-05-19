@@ -351,6 +351,37 @@ node234 joinNode(node234 v1, node234 v2){
 
 }
 
+void leafInsert(struct frac f, struct node234 *leaf){     // only called at non-empty and non-full leaf nodes, i.e either one or two values exist in the leaf
+
+  if (leaf->V[2].b != 0) {
+    printf("Error: Attempted to insert into a full leaf.\n");
+    return;
+  }
+
+
+  if(compare_frac(f, leaf->V[0]) == -1){        // if fraction f is less than first value -> insert at begining and shift all values to the right 
+    
+    leaf->V[2] = leaf->V[1];
+    leaf->V[1] = leaf->V[0];
+
+    leaf->V[0] = f;
+  
+  } else if (leaf->V[1].b == 0){                // if second value is empty, insert at second slot
+
+    leaf->V[1] = f;
+  
+  } else if (compare_frac(f, leaf->V[1]) == -1){   // if fraction f is less than second value -> insert at second slot and shift last value to third spot 
+
+      leaf->V[2] = leaf->V[1];
+      leaf->V[1] = f;
+
+  } else {                                         // if fraction f is larger than second value -> insert at last spot
+    
+      leaf->V[2] = f;
+  
+  }
+}
+
 
 // implemented functions
 
