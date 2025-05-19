@@ -419,8 +419,23 @@ int searchFrac(struct frac f){
   return -1;
 };
 
-void inOrder(int tree_size){
-  
+void inOrder(node234 v){
+
+  for (int i = 0; i < 3; i++){
+    
+    if (v->p[i] != NULL){
+      inOrder(v->p[i]);
+    }
+
+    if(v->V[i].b != 0){
+      printf("%llu/%llu ", v->V[i].a, v->V[i].b);
+    }
+  }
+
+  if (v->p[3] != NULL){
+    inOrder(v->p[3]);
+  }
+
 };
 
 void preOrder(node234 v) { 
@@ -570,7 +585,7 @@ int main(){
             case 'N':
                 
                 if (root != NULL){
-                  inOrder(tree_size);
+                  inOrder(root);
                 }
                 printf("\n");
 
