@@ -2,39 +2,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h> 
-#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
 
 
-// structures
+/* structures */
 
 typedef struct node234* node234;
 
-struct frac{                                    // Stores a fraction
+struct frac{                                    /* Stores a fraction*/
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wlong-long"
-  unsigned long long int a;                     // Numerator
-  unsigned long long int b;                     // Denominator
+  unsigned long long int a;                     /* Numerator*/
+  unsigned long long int b;                     /* Denominator*/
 #pragma GCC diagnostic pop
 };
 
 struct node234{
-  struct frac V[3];         // Key values
-  node234 p[4];             // Pointers
+  struct frac V[3];         /* Key values*/
+  node234 p[4];             /* Pointers*/
 };
 
 
-// global variables 
+/* global variables */
 
-node234 A;                     // Array A of nodes
-struct node234 *root;          // root node 
+node234 A;                     /* Array A of nodes*/
+struct node234 *root;          /* root node */
 
-struct node234 *S;             // Stack of nodes 
+struct node234 *S;             /* Stack of nodes */
 
-// given functions
+/* given functions*/
 
-int ptr2loc(node234 v)     // return index i of A[i] that contains node v 
+int ptr2loc(node234 v)     /* return index i of A[i] that contains node v */
 {
   int r;
   r = -1;
@@ -45,7 +44,7 @@ int ptr2loc(node234 v)     // return index i of A[i] that contains node v
   return (int)r;
 }
 
-void showNode(node234 v)    // prints node
+void showNode(node234 v)    /* prints node*/
 {
   int f;
   int k;
@@ -54,7 +53,7 @@ void showNode(node234 v)    // prints node
   printf("node: %d ", ptr2loc(v));
   k = 0;
   
-  while(true){
+  while(1){
     printf("%d ", ptr2loc(v->p[k]));
     if(3 == k) break;
     printf("%llu/%llu ", v->V[k].a, v->V[k].b);
@@ -65,7 +64,7 @@ void showNode(node234 v)    // prints node
 
 }
 
-void structLoad(void)          // load a config directly to array A
+void structLoad(void)          /* load a config directly to array A*/
 {
   int i;
 #pragma GCC diagnostic push
@@ -108,7 +107,7 @@ void structLoad(void)          // load a config directly to array A
 
       k = 0;
 
-      while(true){
+      while(1){
         tok = strtok(NULL, " ");
         sscanf(tok, "%llu", &j);
         A[i].p[k] = NULL;
@@ -135,10 +134,10 @@ void structLoad(void)          // load a config directly to array A
   free(line);
 }
 
-void vizShow(FILE *f, int n)          // produce description of current state in dot language
+void vizShow(FILE *f, int n)          /* produce description of current state in dot language*/
 {
   int i;
-  node234 *Q = calloc(n+1, sizeof(node234));  // Queue of nodes to print 
+  node234 *Q = calloc(n+1, sizeof(node234));  /* Queue of nodes to print */
   int in = 0;
   int out = 0;
 
@@ -148,7 +147,7 @@ void vizShow(FILE *f, int n)          // produce description of current state in
   Q[in] = root;
   in++;
 
-  while(NULL != Q[out]){                      // Non-empty Queue 
+  while(NULL != Q[out]){                      /* Non-empty Queue */
     i = ptr2loc(Q[out]);
     fprintf(f, "A%d [label=\"{<h> A[%d] |{<p0> %llu/%llu |<p1> %llu/%llu |<p2> %llu/%llu}}\"]\n",
 	    i, i,
@@ -172,7 +171,7 @@ void vizShow(FILE *f, int n)          // produce description of current state in
   Q[in] = root;
   in++;
 
-  while(NULL != Q[out]){                      // Non-empty Queue 
+  while(NULL != Q[out]){                      /* Non-empty Queue */
     i = 0;
 
     while(NULL != Q[out]->p[i] && i < 4){
@@ -197,7 +196,7 @@ void vizShow(FILE *f, int n)          // produce description of current state in
 }
 
 
-// help functions
+/* help functions*/
 
 /* Function to compute the greatest common divisor using Euclidean algorithm */
 unsigned long long gcd(unsigned long long a, unsigned long long b) {
@@ -211,35 +210,37 @@ unsigned long long gcd(unsigned long long a, unsigned long long b) {
 
 /* Function to compare two fractions using the Euclidean algorithm */
 int compare_frac(struct frac f1, struct frac f2) {
-  if(f2.b == 0) { // case where second value is not defined, so we know we have to descend to the pointer to the left
-    return -1;
-  }
-
   unsigned long long lhs = f1.a * f2.b;
   unsigned long long rhs = f2.a * f1.b;
+
+  if(f2.b == 0) { /* case where second value is not defined, so we know we have to descend to the pointer to the left*/
+    return -1;
+  }
   
   if (lhs < rhs) return -1;
   if (lhs > rhs) return 1;
+  if (lhs == rhs) return 0;
   return 0;
 }
 
 void process_file(const char* filename) {
+  char line[256];
   FILE* file = fopen(filename, "r");
   if (!file) {
       perror("Error opening file");
       return;
   }
   
-  char line[256];
   while (fgets(line, sizeof(line), file)) {
-      if (line[0] == '#') {
-          printf("%s", line); // Print comment lines
-          continue;
-      }
-      
       char command;
       struct frac f;
       int index;
+      if (line[0] == '#') {
+          printf("%s", line); /* Print comment lines*/
+          continue;
+      }
+      
+      
       
       if (sscanf(line, " %c", &command) != 1) continue;
       
@@ -247,33 +248,33 @@ void process_file(const char* filename) {
           case 'S':
               if (sscanf(line, "S %d", &index) == 1) {
                   printf("Show node at index %d\n", index);
-                  // Call showNode(index);
+                  /* Call showNode(index);*/
               }
               break;
           case 'F':
               if (sscanf(line, "F %llu/%llu", &f.a, &f.b) == 2) {
                   printf("Searching for fraction %llu/%llu\n", f.a, f.b);
-                  // Call search function and return index
+                  /* Call search function and return index*/
               }
               break;
           case 'N':
               printf("Printing tree in inorder\n");
-              // Call inorder print function
+              /* Call inorder print function*/
               break;
           case 'P':
               printf("Printing tree in preorder\n");
-              // Call preorder print function
+              /* Call preorder print function*/
               break;
           case 'I':
               if (sscanf(line, "I %llu/%llu", &f.a, &f.b) == 2) {
                   printf("Inserting fraction %llu/%llu\n", f.a, f.b);
-                  // Call insert function
+                  /* Call insert function*/
               }
               break;
           case 'D':
               if (sscanf(line, "D %llu/%llu", &f.a, &f.b) == 2) {
                   printf("Deleting fraction %llu/%llu\n", f.a, f.b);
-                  // Call delete function
+                  /* Call delete function*/
               }
               break;
           case 'L':
@@ -292,26 +293,7 @@ void process_file(const char* filename) {
   fclose(file);
 }
 
-// ------------------------
-
-int compareFrac(struct frac f1, struct frac f2) {
-
-    if (f1.b == 0 || f2.b == 0){
-      return 2;
-    }
-    
-    double val1 = (double)f1.a / f1.b;
-    double val2 = (double)f2.a / f2.b;
-    
-    return (val1 > val2) - (val1 < val2);
-}
-
-int compareQ(const void* a, const void* b) {
-    const struct frac* f1 = (const struct frac*)a;
-    const struct frac* f2 = (const struct frac*)b;
-    
-    return compareFrac(*f1, *f2);
-}
+/* ------------------------*/
 
 void splitNode(node234 c, int i){ 
   /*i is to check what pointer do we split
@@ -320,7 +302,7 @@ void splitNode(node234 c, int i){
   if(i == 0){
     c->V[2] = c->V[1];
     c->V[1] = c->V[0];
-    c->V[0] = c->p[0]->V[1]; //here we moved all the values of the current to the right
+    c->V[0] = c->p[0]->V[1]; /*here we moved all the values of the current to the right*/
 
     c->p[3] = c->p[2];
     c->p[2] = c->p[1]; /*move the pointers to the right, p0 is already good*/
@@ -343,7 +325,7 @@ void splitNode(node234 c, int i){
 
   if(i == 1){
     c->V[2] = c->V[1];
-    c->V[1] = c->p[1]->V[1]; //here we moved all the values of the current to the right
+    c->V[1] = c->p[1]->V[1]; /*here we moved all the values of the current to the right*/
 
     c->p[3] = c->p[2];
     c->p[2] = S; /*new node insertion*/
@@ -363,7 +345,7 @@ void splitNode(node234 c, int i){
   }
 
   if(i == 2){
-    c->V[2] = c->p[2]->V[1]; //here we moved all the values of the current to the right
+    c->V[2] = c->p[2]->V[1]; /*here we moved all the values of the current to the right*/
 
     c->p[3] = S; /*new node insertion*/
     S = S->p[3];
@@ -392,7 +374,7 @@ node234 joinNode(node234 v1, node234 v2){
 
 }
 
-void leafInsert(struct frac f, struct node234 *leaf){     // only called at non-empty and non-full leaf nodes, i.e either one or two values exist in the leaf
+void leafInsert(struct frac f, struct node234 *leaf){     /* only called at non-empty and non-full leaf nodes, i.e either one or two values exist in the leaf*/
 
   if (leaf->V[2].b != 0) {
     printf("Error: Attempted to insert into a full leaf.\n");
@@ -400,23 +382,23 @@ void leafInsert(struct frac f, struct node234 *leaf){     // only called at non-
   }
 
 
-  if(compare_frac(f, leaf->V[0]) == -1){        // if fraction f is less than first value -> insert at begining and shift all values to the right 
+  if(compare_frac(f, leaf->V[0]) == -1){        /* if fraction f is less than first value -> insert at begining and shift all values to the right */
     
     leaf->V[2] = leaf->V[1];
     leaf->V[1] = leaf->V[0];
 
     leaf->V[0] = f;
   
-  } else if (leaf->V[1].b == 0){                // if second value is empty, insert at second slot
+  } else if (leaf->V[1].b == 0){                /* if second value is empty, insert at second slot*/
 
     leaf->V[1] = f;
   
-  } else if (compare_frac(f, leaf->V[1]) == -1){   // if fraction f is less than second value -> insert at second slot and shift last value to third spot 
+  } else if (compare_frac(f, leaf->V[1]) == -1){   /* if fraction f is less than second value -> insert at second slot and shift last value to third spot */
 
       leaf->V[2] = leaf->V[1];
       leaf->V[1] = f;
 
-  } else {                                         // if fraction f is larger than second value -> insert at last spot
+  } else {                                         /* if fraction f is larger than second value -> insert at last spot*/
     
       leaf->V[2] = f;
   
@@ -424,27 +406,27 @@ void leafInsert(struct frac f, struct node234 *leaf){     // only called at non-
 }
 
 
-// implemented functions
+/* implemented functions*/
 
 int searchFrac(struct frac f){
 
-  bool found = false;
+  int found = 0;
   struct node234 *v = root;
   int next;
 
   while (!found){
-
+    int i;
     next = 3;
 
-    for (int i = 0; i < 3; i++){ 
+    for (i = 0; i < 3; i++){ 
 
-      //printf("Looking for %llu/%llu in node %d, comparing to %llu/%llu\n", f.a, f.b, ptr2loc(v), v->V[i].a, v->V[i].b);
+      /*printf("Looking for %llu/%llu in node %d, comparing to %llu/%llu\n", f.a, f.b, ptr2loc(v), v->V[i].a, v->V[i].b);*/
 
-      if (compareFrac(f, v->V[i]) == 0){
-        found = true;
+      if (compare_frac(f, v->V[i]) == 0){
+        found = 1;
         return ptr2loc(v);
 
-      } else if (compareFrac(f, v->V[i]) == -1 || compareFrac(f, v->V[i]) == 2){
+      } else if (compare_frac(f, v->V[i]) == -1){
         next = i;
         break;
       }
@@ -458,11 +440,12 @@ int searchFrac(struct frac f){
   }
   
   return -1;
-};
+}
 
 void inOrder(node234 v){
 
-  for (int i = 0; i < 3; i++){
+  int i;
+  for (i = 0; i < 3; i++){
     
     if (v->p[i] != NULL){
       inOrder(v->p[i]);
@@ -477,12 +460,13 @@ void inOrder(node234 v){
     inOrder(v->p[3]);
   }
 
-};
+}
 
 void preOrder(node234 v) { 
+  int i;
   printf("%d ", ptr2loc(v));
-
-  for (int i = 0; i < 4; i++) {
+  
+  for (i = 0; i < 4; i++) {
     if (v->p[i] != NULL) {
       preOrder(v->p[i]);
     }
@@ -495,7 +479,7 @@ int isLeaf(node234 v) {
 
 int insert(struct frac f){
 
-  if (root == NULL){ // first insertion (check if relevant?)
+  if (root == NULL){ /* first insertion (check if relevant?)*/
     root = S;
     S = S->p[3];
     root->V[0] = f;
@@ -506,8 +490,8 @@ int insert(struct frac f){
 
     int inserted = 0;
     struct node234 *current_node = root;
-    //root is current_node because before the while loop
-    if(current_node->V[2].b != 0){     //here we check if root is a 4 node, if it is we split it
+    /*root is current_node because before the while loop*/
+    if(current_node->V[2].b != 0){     /*here we check if root is a 4 node, if it is we split it*/
       printf("Spliting node %d\n", ptr2loc(current_node));
 
       root = S;
@@ -532,11 +516,11 @@ int insert(struct frac f){
       current_node->V[2].a = 0 ;
       current_node->V[2].b = 0 ;
 
-      current_node = root; // now we can continue with the current node as root
+      current_node = root; /* now we can continue with the current node as root*/
 
     }
 
-    else if(isLeaf(current_node)){  // if root is leaf node, insert directly
+    else if(isLeaf(current_node)){  /* if root is leaf node, insert directly*/
       leafInsert(f, current_node);
       inserted = 1;
 
@@ -545,18 +529,18 @@ int insert(struct frac f){
 
 
     while(!inserted){
-      // Check for every pointer if we have to descend to it 
-      // then split if it's 4 node and redo the loop. 
-      // Insert inside only leaf nodes.
-      if(compare_frac(f, current_node->V[0]) == -1){  // navigate down p0 
-        if(current_node->p[0]->V[2].b != 0){ // p0 is a 4node
+      /*Check for every pointer if we have to descend to it 
+        then split if it's 4 node and redo the loop. 
+        Insert inside only leaf nodes. */
+      if(compare_frac(f, current_node->V[0]) == -1){  /* navigate down p0 */
+        if(current_node->p[0]->V[2].b != 0){ /* p0 is a 4node*/
           printf("Spliting node %d\n", ptr2loc(current_node->p[0]));
           splitNode(current_node, 0);
           continue;                       
         }
 
         current_node = current_node->p[0];           
-        // p0 case done 
+        /* p0 case done */
 
         if(isLeaf(current_node)){ 
           leafInsert(f, current_node);
@@ -567,8 +551,8 @@ int insert(struct frac f){
       } 
       
  
-      else if(compare_frac(f, current_node->V[1]) == -1){ // Navigate down p1
-        if(current_node->p[1]->V[2].b != 0){ // p1 is a 4node
+      else if(compare_frac(f, current_node->V[1]) == -1){ /* Navigate down p1*/
+        if(current_node->p[1]->V[2].b != 0){ /* p1 is a 4node*/
           printf("Spliting node %d\n", ptr2loc(current_node->p[1]));
           splitNode(current_node, 1);
           continue;                        
@@ -581,8 +565,8 @@ int insert(struct frac f){
         }
       } 
       
-      else {                                 // navigate down p2
-        if(current_node->p[2]->V[2].b != 0){ // p2 is a 4node
+      else {                                 /* navigate down p2*/
+        if(current_node->p[2]->V[2].b != 0){ /* p2 is a 4node*/
           printf("Spliting node %d\n", ptr2loc(current_node->p[2]));
           splitNode(current_node, 2);
           continue;
@@ -599,8 +583,8 @@ int insert(struct frac f){
       } 
     }
   }
-  return -1; // if we reach here, something went wrong
-};
+  return -1; /* if we reach here, something went wrong*/
+}
 
 int delete(struct frac f){
   
@@ -608,13 +592,13 @@ int delete(struct frac f){
 
   return index;
 
-};
+}
 
 
-int main(){
+int main(void){
   
-  //const char* filename = "P1-tests/T03/input";
-  //freopen(filename, "r", stdin);
+  /*const char* filename = "P1-tests/T03/input";*/
+  /*freopen(filename, "r", stdin);*/
 
   size_t len = 256;
   char *line = (char*)malloc(len*sizeof(char));
@@ -624,6 +608,8 @@ int main(){
 
   int index;
   struct frac f;
+  int i ;
+
 
   getline(&line, &len, stdin);
   sscanf(line, "%d", &tree_size);  
@@ -632,12 +618,13 @@ int main(){
   S = &A[tree_size-1];
   root = NULL;
 
-  for (int i = 1; i < tree_size; i++){
+
+  for (i = 1; i < tree_size; i++){
     A[i].p[3] = &A[i-1];
   }
 
   while (sscanf(line, " %c", &command) != -1) {
-  
+    int i;
     getline(&line, &len, stdin);
     sscanf(line, "%c", &command); 
 
@@ -646,7 +633,6 @@ int main(){
             case 'S':
                 
                 if (sscanf(line, "S %d", &index) == 1) {
-                    //printf("Showing node ‰llu", index);
                     showNode(&A[index]);
                 }
 
@@ -655,7 +641,6 @@ int main(){
             case 'F':
                 
                 if (sscanf(line, "F %llu/%llu", &f.a, &f.b) == 2) {
-                    //printf("The fraction %llu/%llu can be found at index: ", &f.a, &f.b);
                     printf("%d\n", searchFrac(f));
 
                 }
@@ -695,7 +680,6 @@ int main(){
             case 'D':
 
                 if (sscanf(line, "D %llu/%llu", &f.a, &f.b) == 2) {
-                    //printf("Deleting fraction %llu/%llu\n", f.a, f.b);
                     index = delete(f);
                     printf("%d\n", index);
                 }
@@ -703,18 +687,18 @@ int main(){
                 break;
 
             case 'L':
-
-                //printf("\nLoading tree configuration\n");
                 structLoad();
                 break;
 
             case 'X':
-                // printing final configuration: location of node S and root + all nodes
+                /* printing final configuration: location of node S and root + all nodes*/
+                
                 printf("Final configuration:\n");
                 printf("S: %d ", ptr2loc(S));
                 printf("root: %d \n", ptr2loc(root));
-
-                for (int i = 0; i < tree_size; i++){
+                
+                
+                for (i = 0; i < tree_size; i++){
                   showNode(&A[i]);
                 }
 
@@ -739,11 +723,10 @@ int main(){
   free(S);
   free(root);
 
-  //printf("%c\n", command);
-  //process_file(filename);
+ 
 
-  // debugging code, will be removed by preprocessor in mooshak: 
-  /* 
+  /* debugging code, will be removed by preprocessor in mooshak: */
+  /*
   #ifndef NDEBUG 
         sprintf(fname, "tree%.3d.dot", fc);
         fistr = fopen(fname, "w");
