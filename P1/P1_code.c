@@ -329,6 +329,10 @@ void splitNode(node234 c, int i){
     S = S->p[3];
     c->p[1]->p[3] = NULL;
     c->p[1]->V[0] = c->p[0]->V[2]; 
+    c->p[1]->p[0] = c->p[0]->p[2];
+    c->p[1]->p[1] = c->p[0]->p[3];
+    c->p[0]->p[2] = NULL;
+    c->p[0]->p[3] = NULL; 
     
     c->p[0]->V[1].a = 0 ;
     c->p[0]->V[1].b = 0 ;
@@ -346,6 +350,10 @@ void splitNode(node234 c, int i){
     S = S->p[3];
     c->p[2]->p[3] = NULL;
     c->p[2]->V[0] = c->p[1]->V[2];
+    c->p[2]->p[0] = c->p[1]->p[2];
+    c->p[2]->p[1] = c->p[1]->p[3];
+    c->p[1]->p[2] = NULL;
+    c->p[1]->p[3] = NULL;
 
     c->p[1]->V[1].a = 0 ;
     c->p[1]->V[1].b = 0 ;
@@ -361,6 +369,10 @@ void splitNode(node234 c, int i){
     S = S->p[3];
     c->p[3]->p[3] = NULL;
     c->p[3]->V[0] = c->p[2]->V[2];
+    c->p[3]->p[0] = c->p[2]->p[2];
+    c->p[3]->p[1] = c->p[2]->p[3];
+    c->p[2]->p[2] = NULL;
+    c->p[2]->p[3] = NULL;
 
     c->p[2]->V[1].a = 0 ;
     c->p[2]->V[1].b = 0 ;
@@ -508,6 +520,10 @@ int insert(struct frac f){
       root->p[1] = S ;
       S = S->p[3];
       root->p[1]->V[0] = current_node->V[2];
+      root->p[1]->p[0] = current_node->p[2];
+      root->p[1]->p[1] = current_node->p[3];
+      current_node->p[2] = NULL;
+      current_node->p[3] = NULL;
       root->p[1]->p[3] = NULL;
 
       current_node->V[1].a = 0 ;
@@ -539,7 +555,7 @@ int insert(struct frac f){
           continue;                       
         }
 
-        current_node = current_node->p[0];               
+        current_node = current_node->p[0];           
         // p0 case done 
 
         if(isLeaf(current_node)){ 
@@ -551,7 +567,7 @@ int insert(struct frac f){
       } 
       
  
-      if(compare_frac(f, current_node->V[1]) == -1){ // Navigate down p1
+      else if(compare_frac(f, current_node->V[1]) == -1){ // Navigate down p1
         if(current_node->p[1]->V[2].b != 0){ // p1 is a 4node
           printf("Spliting node %d\n", ptr2loc(current_node->p[1]));
           splitNode(current_node, 1);
