@@ -211,14 +211,10 @@ unsigned long long gcd(unsigned long long a, unsigned long long b) {
 
 /* Function to compare two fractions using the Euclidean algorithm */
 int compare_frac(struct frac f1, struct frac f2) {
-  unsigned long long gcd1 = gcd(f1.a, f1.b);
-  unsigned long long gcd2 = gcd(f2.a, f2.b);
-  
-  f1.a /= gcd1;
-  f1.b /= gcd1;
-  f2.a /= gcd2;
-  f2.b /= gcd2;
-  
+  if(f2.b == 0) { // case where second value is not defined, so we know we have to descend to the pointer to the left
+    return -1;
+  }
+
   unsigned long long lhs = f1.a * f2.b;
   unsigned long long rhs = f2.a * f1.b;
   
@@ -331,6 +327,7 @@ void splitNode(node234 c, int i){
 
     c->p[1] = S; /*new node insertion*/
     S = S->p[3];
+    c->p[1]->p[3] = NULL;
     c->p[1]->V[0] = c->p[0]->V[2]; 
     
     c->p[0]->V[1].a = 0 ;
@@ -347,6 +344,7 @@ void splitNode(node234 c, int i){
     c->p[3] = c->p[2];
     c->p[2] = S; /*new node insertion*/
     S = S->p[3];
+    c->p[2]->p[3] = NULL;
     c->p[2]->V[0] = c->p[1]->V[2];
 
     c->p[1]->V[1].a = 0 ;
@@ -361,6 +359,7 @@ void splitNode(node234 c, int i){
 
     c->p[3] = S; /*new node insertion*/
     S = S->p[3];
+    c->p[3]->p[3] = NULL;
     c->p[3]->V[0] = c->p[2]->V[2];
 
     c->p[2]->V[1].a = 0 ;
@@ -497,29 +496,34 @@ int insert(struct frac f){
     struct node234 *current_node = root;
     //root is current_node because before the while loop
     if(current_node->V[2].b != 0){     //here we check if root is a 4 node, if it is we split it
-      printf("inside split\n");
+      printf("Spliting node %d\n", ptr2loc(current_node));
+
       root = S;
-      
       S = S->p[3];
+      root->p[3] = NULL;
+
       root->V[0] = current_node->V[1];
       root->p[0] = current_node;
 
       root->p[1] = S ;
       S = S->p[3];
       root->p[1]->V[0] = current_node->V[2];
+      root->p[1]->p[3] = NULL;
 
       current_node->V[1].a = 0 ;
       current_node->V[1].b = 0 ;
 
       current_node->V[2].a = 0 ;
       current_node->V[2].b = 0 ;
-      
-      printf("Splitted %i", ptr2loc(current_node));
+
+      current_node = root; // now we can continue with the current node as root
+
     }
 
     else if(isLeaf(current_node)){  // if root is leaf node, insert directly
       leafInsert(f, current_node);
       inserted = 1;
+
       return ptr2loc(current_node);
     }
 
@@ -528,9 +532,9 @@ int insert(struct frac f){
       // Check for every pointer if we have to descend to it 
       // then split if it's 4 node and redo the loop. 
       // Insert inside only leaf nodes.
-
       if(compare_frac(f, current_node->V[0]) == -1){  // navigate down p0 
         if(current_node->p[0]->V[2].b != 0){ // p0 is a 4node
+          printf("Spliting node %d\n", ptr2loc(current_node->p[0]));
           splitNode(current_node, 0);
           continue;                       
         }
@@ -541,18 +545,19 @@ int insert(struct frac f){
         if(isLeaf(current_node)){ 
           leafInsert(f, current_node);
           inserted = 1;
+
         return ptr2loc(current_node);
         }
       } 
       
-      else if(compare_frac(f, current_node->V[1]) == -1){ // Navigate down p1
+ 
+      if(compare_frac(f, current_node->V[1]) == -1){ // Navigate down p1
         if(current_node->p[1]->V[2].b != 0){ // p1 is a 4node
+          printf("Spliting node %d\n", ptr2loc(current_node->p[1]));
           splitNode(current_node, 1);
           continue;                        
         }
-
         current_node = current_node->p[1];
-
         if(isLeaf(current_node)){  
           leafInsert(f, current_node);
           inserted = 1;
@@ -562,11 +567,12 @@ int insert(struct frac f){
       
       else {                                 // navigate down p2
         if(current_node->p[2]->V[2].b != 0){ // p2 is a 4node
+          printf("Spliting node %d\n", ptr2loc(current_node->p[2]));
           splitNode(current_node, 2);
           continue;
         }
 
-        current_node = current_node->p[1];
+        current_node = current_node->p[2];
 
         if(isLeaf(current_node)){ 
           leafInsert(f, current_node);
@@ -660,14 +666,12 @@ int main(){
             case 'I':
 
                 if (sscanf(line, "I %llu/%llu", &f.a, &f.b) == 2) {
-                    //printf("Inserting fraction %llu/%llu\n", f.a, f.b);
                     index = insert(f);
                     if (index == -1) {
                         printf("Error inserting fraction %llu/%llu\n", f.a, f.b);
                     } else {
-                        printf("Inserted at index: %d\n", index);
+                        printf("%d\n", index);
                     }
-                    printf("%d\n", index);
                 }
 
                 break;
