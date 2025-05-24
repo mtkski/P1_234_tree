@@ -28,7 +28,7 @@ struct node234{
 // global variables 
 
 node234 A;                     // Array A of nodes
-struct node234* root;          // root node 
+struct node234 *root;          // root node 
 
 struct node234 *S;             // Stack of nodes 
 
@@ -339,6 +339,36 @@ void splitNode(node234 c, int i){
     c->p[0]->V[2].a = 0 ;
     c->p[0]->V[2].b = 0 ; /*here we delete everything from p0 (only the value of v0 stays)*/
   }
+
+  if(i == 1){
+    c->V[2] = c->V[1];
+    c->V[1] = c->p[1]->V[1]; //here we moved all the values of the current to the right
+
+    c->p[3] = c->p[2];
+    c->p[2] = S; /*new node insertion*/
+    S = S->p[3];
+    c->p[2]->V[0] = c->p[1]->V[2];
+
+    c->p[1]->V[1].a = 0 ;
+    c->p[1]->V[1].b = 0 ;
+
+    c->p[1]->V[2].a = 0 ;
+    c->p[1]->V[2].b = 0 ; /*here we delete everything from p1 (only the value of v0 stays)*/
+  }
+
+  if(i == 2){
+    c->V[2] = c->p[2]->V[1]; //here we moved all the values of the current to the right
+
+    c->p[3] = S; /*new node insertion*/
+    S = S->p[3];
+    c->p[3]->V[0] = c->p[2]->V[2];
+
+    c->p[2]->V[1].a = 0 ;
+    c->p[2]->V[1].b = 0 ;
+
+    c->p[2]->V[2].a = 0 ;
+    c->p[2]->V[2].b = 0 ; /*here we delete everything from p2 (only the value of v0 stays)*/
+  }
   
 }
 
@@ -448,6 +478,10 @@ void preOrder(node234 v) {
   }
 }
 
+int isLeaf(node234 v) {
+  return (v->p[0] == NULL && v->p[1] == NULL && v->p[2] == NULL && v->p[3] == NULL);
+}
+
 int insert(struct frac f){
 
   if (root == NULL){ // first insertion (check if relevant?)
@@ -455,19 +489,18 @@ int insert(struct frac f){
     S = S->p[3];
     root->V[0] = f;
     root->p[3] = NULL;
-
     return ptr2loc(root);
 
   } else {
 
     int inserted = 0;
     struct node234 *current_node = root;
-
-
-    if(current_node->V[2].b != 0){     //root is current_node because before the while loop 
+    //root is current_node because before the while loop
+    if(current_node->V[2].b != 0){     //here we check if root is a 4 node, if it is we split it
+      printf("inside split\n");
       root = S;
+      
       S = S->p[3];
-
       root->V[0] = current_node->V[1];
       root->p[0] = current_node;
 
@@ -480,46 +513,71 @@ int insert(struct frac f){
 
       current_node->V[2].a = 0 ;
       current_node->V[2].b = 0 ;
-
+      
       printf("Splitted %i", ptr2loc(current_node));
-      return ptr2loc(current_node); // return the node that was splitted
+    }
+
+    else if(isLeaf(current_node)){  // if root is leaf node, insert directly
+      leafInsert(f, current_node);
+      inserted = 1;
+      return ptr2loc(current_node);
     }
 
 
     while(!inserted){
-      // check for every pointer only we have to descend to it 
-      // Alice -> descend the tree to know where to insert
-      // we only check every pointer, insert inside only leaf nodes
+      // Check for every pointer if we have to descend to it 
+      // then split if it's 4 node and redo the loop. 
+      // Insert inside only leaf nodes.
 
       if(compare_frac(f, current_node->V[0]) == -1){  // navigate down p0 
         if(current_node->p[0]->V[2].b != 0){ // p0 is a 4node
           splitNode(current_node, 0);
-          continue;                         // going to restart the while loop
+          continue;                       
         }
 
         current_node = current_node->p[0];               
         // p0 case done 
 
-      } else if(current_node->V[1].b != 0){                     // add frac middle space because it is NULL
-        current_node->V[1] = f;
-        inserted = 1;
+        if(isLeaf(current_node)){ 
+          leafInsert(f, current_node);
+          inserted = 1;
         return ptr2loc(current_node);
-
-      } else if (compare_frac(f, current_node->V[1]) == -1){    // navigate down second pointer
+        }
+      } 
+      
+      else if(compare_frac(f, current_node->V[1]) == -1){ // Navigate down p1
         if(current_node->p[1]->V[2].b != 0){ // p1 is a 4node
           splitNode(current_node, 1);
-          continue;                         // going to restart the while loop
+          continue;                        
         }
 
         current_node = current_node->p[1];
 
-      } else if(current_node->V[2].b != 0){                     // add frac right space because it is NULL
-        current_node->V[2] = f;
-        inserted = 1;
+        if(isLeaf(current_node)){  
+          leafInsert(f, current_node);
+          inserted = 1;
         return ptr2loc(current_node);
-      }
+        }
+      } 
+      
+      else {                                 // navigate down p2
+        if(current_node->p[2]->V[2].b != 0){ // p2 is a 4node
+          splitNode(current_node, 2);
+          continue;
+        }
+
+        current_node = current_node->p[1];
+
+        if(isLeaf(current_node)){ 
+          leafInsert(f, current_node);
+          inserted = 1;
+        return ptr2loc(current_node);
+        }
+
+      } 
     }
   }
+  return -1; // if we reach here, something went wrong
 };
 
 int delete(struct frac f){
@@ -604,6 +662,11 @@ int main(){
                 if (sscanf(line, "I %llu/%llu", &f.a, &f.b) == 2) {
                     //printf("Inserting fraction %llu/%llu\n", f.a, f.b);
                     index = insert(f);
+                    if (index == -1) {
+                        printf("Error inserting fraction %llu/%llu\n", f.a, f.b);
+                    } else {
+                        printf("Inserted at index: %d\n", index);
+                    }
                     printf("%d\n", index);
                 }
 
