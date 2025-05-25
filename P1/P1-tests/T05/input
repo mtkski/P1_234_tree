@@ -19,4 +19,13 @@ S 9
 S 7
 S 6
 D 1/8
+I 5/7
+I 1/3
+I 1/4
+I 2/7
+I 1/5
+I 1/10
+# without 7/23 we have 2 node in successor (case TODO)
+I 7/23
+D 1/3
 X

@@ -605,6 +605,41 @@ int deleteFromLeaf(struct frac f, struct node234 *leaf) {
   return ptr2loc(leaf); 
 }
 
+struct frac findSuccessor(int pos, struct node234 *search_current){
+  int leafIs2node;
+  struct frac successor;
+  while(!isLeaf(search_current)){
+          search_current = search_current->p[0];
+        }
+        leafIs2node = is2node(search_current);
+        successor = search_current->V[0];
+        deleteFromLeaf(search_current->V[0], search_current);
+
+        if (leafIs2node)
+        {
+          search_current->p[3] = S;
+          S = search_current;
+        }
+        return successor;
+}
+
+int deleteFromInternalNode(struct frac f, struct node234 *c) {
+  /* delete fraction f from internal node */
+  int pos = positionInNode(f, c);
+  struct frac successor;
+  node234 search_current = c;
+  printf("Deleting %llu/%llu from internal node %d at position %d\n", f.a, f.b, ptr2loc(c), pos);
+  
+  successor = findSuccessor(pos, c->p[pos]);
+  printf("successor found : %d/%d \n",successor.a, successor.b);
+
+  c->V[pos] = successor; /*we delete the successor in the findSucessor function*/
+  
+  /* TODO take care of the case where we meet some 2nodes again */
+  
+  return ptr2loc(c);
+}
+
 int delete(struct frac f){
   int index = searchFrac(f);
   int deleted = 0;
@@ -625,14 +660,13 @@ int delete(struct frac f){
       {
         printf("Found %llu/%llu in node %d\n", f.a, f.b, ptr2loc(c));
         if (isLeaf(c)) {
-          printf("%d is a leaf node\n", ptr2loc(c));
           index = deleteFromLeaf(f, c);
           deleted = 1;
         } 
         
-        else { /*successor case */
-          printf("NON LEAF NODE, need to find successor.\n");
-          return -1;
+        else { 
+          index = deleteFromInternalNode(f, c);
+          deleted = 1;
         }
       }
     }
@@ -742,7 +776,6 @@ int main(void){
                 printf("Final configuration:\n");
                 printf("S: %d ", ptr2loc(S));
                 printf("root: %d \n", ptr2loc(root));
-                
                 
                 for (i = 0; i < tree_size; i++){
                   showNode(&A[i]);
