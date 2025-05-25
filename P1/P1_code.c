@@ -26,7 +26,7 @@ struct node234{
 
 /* global variables */
 
-node234 A;                     /* Array A of nodes*/
+struct node234 *A;             /* Array A of nodes*/
 struct node234 *root;          /* root node */
 
 struct node234 *S;             /* Stack of nodes */
@@ -223,76 +223,6 @@ int compare_frac(struct frac f1, struct frac f2) {
   return 0;
 }
 
-void process_file(const char* filename) {
-  char line[256];
-  FILE* file = fopen(filename, "r");
-  if (!file) {
-      perror("Error opening file");
-      return;
-  }
-  
-  while (fgets(line, sizeof(line), file)) {
-      char command;
-      struct frac f;
-      int index;
-      if (line[0] == '#') {
-          printf("%s", line); /* Print comment lines*/
-          continue;
-      }
-      
-      
-      
-      if (sscanf(line, " %c", &command) != 1) continue;
-      
-      switch (command) {
-          case 'S':
-              if (sscanf(line, "S %d", &index) == 1) {
-                  printf("Show node at index %d\n", index);
-                  /* Call showNode(index);*/
-              }
-              break;
-          case 'F':
-              if (sscanf(line, "F %llu/%llu", &f.a, &f.b) == 2) {
-                  printf("Searching for fraction %llu/%llu\n", f.a, f.b);
-                  /* Call search function and return index*/
-              }
-              break;
-          case 'N':
-              printf("Printing tree in inorder\n");
-              /* Call inorder print function*/
-              break;
-          case 'P':
-              printf("Printing tree in preorder\n");
-              /* Call preorder print function*/
-              break;
-          case 'I':
-              if (sscanf(line, "I %llu/%llu", &f.a, &f.b) == 2) {
-                  printf("Inserting fraction %llu/%llu\n", f.a, f.b);
-                  /* Call insert function*/
-              }
-              break;
-          case 'D':
-              if (sscanf(line, "D %llu/%llu", &f.a, &f.b) == 2) {
-                  printf("Deleting fraction %llu/%llu\n", f.a, f.b);
-                  /* Call delete function*/
-              }
-              break;
-          case 'L':
-              printf("Loading tree configuration\n");
-              structLoad();
-              break;
-          case 'X':
-              printf("Terminating program\n");
-              fclose(file);
-              return;
-          default:
-              printf("Unknown command: %c\n", command);
-      }
-  }
-  
-  fclose(file);
-}
-
 /* ------------------------*/
 
 void splitNode(node234 c, int i){ 
@@ -364,15 +294,6 @@ void splitNode(node234 c, int i){
     c->p[2]->V[2].b = 0 ; /*here we delete everything from p2 (only the value of v0 stays)*/
   }
   
-}
-
-node234 joinNode(node234 v1, node234 v2){
-  /*
-  code
-  */
-  printf("Joining nodes %d%d\n", ptr2loc(v1), ptr2loc(v2));
-  return v1;
-
 }
 
 void leafInsert(struct frac f, struct node234 *leaf){     /* only called at non-empty and non-full leaf nodes, i.e either one or two values exist in the leaf*/
@@ -478,6 +399,80 @@ int isLeaf(node234 v) {
   return (v->p[0] == NULL && v->p[1] == NULL && v->p[2] == NULL && v->p[3] == NULL);
 }
 
+int is4node(node234 v ){
+  return v->V[2].b != 0;
+}
+
+int is3node(node234 v){
+  return v->V[2].b == 0 && v->V[1].b != 0;
+}
+
+int is2node(node234 v){
+  return v->V[1].b == 0;
+}
+
+int isFracInNode(struct frac f, node234 v) {
+  /* returns 1 if f is in node v, 0 otherwise */
+  return (compare_frac(f, v->V[0]) == 0 || 
+          compare_frac(f, v->V[1]) == 0 || 
+          compare_frac(f, v->V[2]) == 0);
+}
+
+int positionInNode(struct frac f, node234 v) {
+  /* returns position of f in node v, if not found returns -1 */
+  if (compare_frac(f, v->V[0]) == 0) return 0;
+  if (compare_frac(f, v->V[1]) == 0) return 1;
+  if (compare_frac(f, v->V[2]) == 0) return 2;
+  return -1; /* not found */
+}
+
+void joinNode(int vi, node234 c, node234 n1, node234 n2){
+  printf("Joining nodes %d %d\n", ptr2loc(n1), ptr2loc(n2));
+  if (is2node(n2))
+  { /* ici on sait que n1 et n2 sont des 2nodes */
+    /*put values in n1 */
+    n1->V[1] = c->V[vi];
+    n1->V[2] = n2->V[0]; 
+    n1->p[2] = n2->p[0];
+    n1->p[3] = n2->p[1];
+    showNode(n1);
+    /*put the empty node back to the stack (n2)*/
+    // TODO put back to S (don't know how)
+    n2->V[0].a = 0 ;
+    n2->V[0].b = 0 ;
+    n2->p[2] = NULL ;
+
+    n2->p[3] = S ;
+    S = n2 ;
+    /* change values and pointers of c*/
+    switch (vi)
+    {
+    case 0 :
+      c->V[0] = c->V[1]; c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
+      c->p[1] = c->p[2]; c->p[2] = c->p[3]; c->p[3] = NULL;
+      break;
+    case 1 :
+      c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
+      c->p[2] = c->p[3]; c->p[3] = NULL;
+      break;
+    case 2:
+      c->V[2].a = 0; c->V[2].b = 0;
+      c->p[3] = NULL;
+      break;
+    default:
+      break;
+    }
+  }
+
+  else if(is3node(n2)){
+
+  }
+
+  else if(is4node(n2)){
+
+  }
+}
+
 int insert(struct frac f){
 
   if (root == NULL){ /* first insertion (check if relevant?)*/
@@ -492,7 +487,7 @@ int insert(struct frac f){
     int inserted = 0;
     struct node234 *current_node = root;
     /*root is current_node because before the while loop*/
-    if(current_node->V[2].b != 0){     /*here we check if root is a 4 node, if it is we split it*/
+    if(is4node(current_node)){
       printf("Spliting node %d\n", ptr2loc(current_node));
 
       root = S;
@@ -534,14 +529,13 @@ int insert(struct frac f){
         then split if it's 4 node and redo the loop. 
         Insert inside only leaf nodes. */
       if(compare_frac(f, current_node->V[0]) == -1){  /* navigate down p0 */
-        if(current_node->p[0]->V[2].b != 0){ /* p0 is a 4node*/
+        if(is4node(current_node->p[0])){ 
           printf("Spliting node %d\n", ptr2loc(current_node->p[0]));
           splitNode(current_node, 0);
           continue;                       
         }
 
-        current_node = current_node->p[0];           
-        /* p0 case done */
+        current_node = current_node->p[0];
 
         if(isLeaf(current_node)){ 
           leafInsert(f, current_node);
@@ -553,12 +547,14 @@ int insert(struct frac f){
       
  
       else if(compare_frac(f, current_node->V[1]) == -1){ /* Navigate down p1*/
-        if(current_node->p[1]->V[2].b != 0){ /* p1 is a 4node*/
+        if(is4node(current_node->p[1])){ 
           printf("Spliting node %d\n", ptr2loc(current_node->p[1]));
           splitNode(current_node, 1);
           continue;                        
         }
+
         current_node = current_node->p[1];
+
         if(isLeaf(current_node)){  
           leafInsert(f, current_node);
           inserted = 1;
@@ -567,7 +563,7 @@ int insert(struct frac f){
       } 
       
       else if(compare_frac(f, current_node->V[2]) == -1){    /* navigate down p2*/
-        if(current_node->p[2]->V[2].b != 0){ /* p2 is a 4node*/
+        if(is4node(current_node->p[2])){ 
           printf("Spliting node %d\n", ptr2loc(current_node->p[2]));
           splitNode(current_node, 2);
           continue;
@@ -581,7 +577,7 @@ int insert(struct frac f){
         return ptr2loc(current_node);
         }
       } 
-      else { /* navigate down p3*/
+      else { /* navigate down p3 (we only do this 'if' when we splitted before)*/
 
         current_node = current_node->p[3];
 
@@ -596,12 +592,53 @@ int insert(struct frac f){
   return -1; /* if we reach here, something went wrong*/
 }
 
+int deleteFromLeaf(struct frac f, struct node234 *leaf) {
+  /* delete fraction f from leaf node */
+  int pos = positionInNode(f, leaf);  
+  switch (pos)
+  {
+  case 0 : leaf->V[0] = leaf->V[1]; leaf->V[1] = leaf->V[2]; leaf->V[2].a = 0; leaf->V[2].b = 0; break;
+  case 1 : leaf->V[1] = leaf->V[2]; leaf->V[2].a = 0; leaf->V[2].b = 0; break;
+  case 2 : leaf->V[2].a = 0; leaf->V[2].b = 0; break;
+  default: break;
+  }
+  return ptr2loc(leaf); 
+}
+
 int delete(struct frac f){
-  
   int index = searchFrac(f);
+  int deleted = 0;
+  struct node234 *c = root;
+  printf("___Deleting %llu/%llu\n", f.a, f.b);
+
+  while(!deleted){
+    if (compare_frac(f, c->V[0]) == -1){ /*move to p0*/
+      if(is2node(c->p[0])){ /*p0 is a 2-node*/
+        /*check for sibling in p[1], otherwhise take p[2] ?*/ /*TO CHECK*/
+        /*p[1] should always exist*/
+        joinNode(0, c, c->p[0], c->p[1]);
+      }
+
+      c = c->p[0];
+
+      if (isFracInNode(f, c))
+      {
+        printf("Found %llu/%llu in node %d\n", f.a, f.b, ptr2loc(c));
+        if (isLeaf(c)) {
+          printf("%d is a leaf node\n", ptr2loc(c));
+          index = deleteFromLeaf(f, c);
+          deleted = 1;
+        } 
+        
+        else { /*successor case */
+          printf("NON LEAF NODE, need to find successor.\n");
+          return -1;
+        }
+      }
+    }
+  }
 
   return index;
-
 }
 
 
@@ -620,11 +657,10 @@ int main(void){
   struct frac f;
   int i ;
 
-
   getline(&line, &len, stdin);
   sscanf(line, "%d", &tree_size);  
   
-  A = calloc(tree_size, sizeof(node234));
+  A = calloc(tree_size, sizeof(struct node234));
   S = &A[tree_size-1];
   root = NULL;
 
@@ -730,8 +766,6 @@ int main(void){
   }
 
   free(A);
-  free(S);
-  free(root);
 
  
 
