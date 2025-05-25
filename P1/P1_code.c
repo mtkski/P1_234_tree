@@ -328,6 +328,7 @@ void splitNode(node234 c, int i){
     c->V[1] = c->p[1]->V[1]; /*here we moved all the values of the current to the right*/
 
     c->p[3] = c->p[2];
+
     c->p[2] = S; /*new node insertion*/
     S = S->p[3];
     c->p[2]->p[3] = NULL;
@@ -565,7 +566,7 @@ int insert(struct frac f){
         }
       } 
       
-      else {                                 /* navigate down p2*/
+      else if(compare_frac(f, current_node->V[2]) == -1){    /* navigate down p2*/
         if(current_node->p[2]->V[2].b != 0){ /* p2 is a 4node*/
           printf("Spliting node %d\n", ptr2loc(current_node->p[2]));
           splitNode(current_node, 2);
@@ -579,8 +580,17 @@ int insert(struct frac f){
           inserted = 1;
         return ptr2loc(current_node);
         }
-
       } 
+      else { /* navigate down p3*/
+
+        current_node = current_node->p[3];
+
+        if(isLeaf(current_node)){ 
+          leafInsert(f, current_node);
+          inserted = 1;
+        return ptr2loc(current_node);
+        }
+      }
     }
   }
   return -1; /* if we reach here, something went wrong*/
