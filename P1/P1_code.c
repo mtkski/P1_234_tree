@@ -225,6 +225,18 @@ int compare_frac(struct frac f1, struct frac f2) {
 
 /* ------------------------*/
 
+void backToStack(struct node234 *node){
+  node->p[3] = S;
+  S = node;
+  S->V[0].a = 0; S->V[0].b = 0;
+  S->V[1].a = 0; S->V[1].b = 0;
+  S->V[2].a = 0; S->V[2].b = 0;  
+
+  S->p[0] = NULL;
+  S->p[1] = NULL;
+  S->p[2] = NULL;
+}
+
 void splitNode(node234 c, int i){ 
   /*i is to check what pointer do we split
     c is the current node
@@ -399,16 +411,11 @@ int isLeaf(node234 v) {
   return (v->p[0] == NULL && v->p[1] == NULL && v->p[2] == NULL && v->p[3] == NULL);
 }
 
-int is4node(node234 v ){
-  return v->V[2].b != 0;
-}
-
-int is3node(node234 v){
-  return v->V[2].b == 0 && v->V[1].b != 0;
-}
-
-int is2node(node234 v){
-  return v->V[1].b == 0;
+int nodeType(node234 v){
+  if(v->V[1].b == 0){return 2;}
+  if(v->V[2].b == 0 && v->V[1].b != 0){return 3;}
+  if(v->V[2].b != 0){return 4;}
+  else {return 0;}
 }
 
 int isFracInNode(struct frac f, node234 v) {
@@ -426,51 +433,210 @@ int positionInNode(struct frac f, node234 v) {
   return -1; /* not found */
 }
 
-void joinNode(int vi, node234 c, node234 n1, node234 n2){
-  printf("Joining nodes %d %d\n", ptr2loc(n1), ptr2loc(n2));
-  if (is2node(n2))
-  { /* ici on sait que n1 et n2 sont des 2nodes */
-    /*put values in n1 */
-    n1->V[1] = c->V[vi];
-    n1->V[2] = n2->V[0]; 
-    n1->p[2] = n2->p[0];
-    n1->p[3] = n2->p[1];
-    showNode(n1);
-    /*put the empty node back to the stack (n2)*/
-    // TODO put back to S (don't know how)
-    n2->V[0].a = 0 ;
-    n2->V[0].b = 0 ;
-    n2->p[2] = NULL ;
+void joinNode(int pivot, node234 c){
+  struct node234 *n1;
+  struct node234 *n2;
+  struct node234 *nodeToDel ;
 
-    n2->p[3] = S ;
-    S = n2 ;
-    /* change values and pointers of c*/
-    switch (vi)
+  if (pivot != 3)
+  {
+    n1 = c->p[pivot];  /*always 2node*/
+    n2 = c->p[pivot+1]; /*check the case of n2*/
+  }
+  else{
+    n2 = c->p[pivot-1];  /*the case where we have to join p3*/
+    n1 = c->p[pivot]; 
+  }
+  
+  printf("Joining nodes %d %d \n", ptr2loc(n1), ptr2loc(n2));
+  switch (nodeType(c))
+  {
+  case 3 :
+    if (nodeType(n2) == 2)
     {
-    case 0 :
-      c->V[0] = c->V[1]; c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
-      c->p[1] = c->p[2]; c->p[2] = c->p[3]; c->p[3] = NULL;
-      break;
-    case 1 :
-      c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
-      c->p[2] = c->p[3]; c->p[3] = NULL;
-      break;
-    case 2:
-      c->V[2].a = 0; c->V[2].b = 0;
-      c->p[3] = NULL;
-      break;
-    default:
-      break;
+      nodeToDel = n2;
+
+      n1->V[1] = c->V[pivot];
+      c->V[pivot] = n2->V[0];
+      n1->p[2] = n2->p[0];
+      c->p[pivot+1] = n2->p[1];
+
+      backToStack(nodeToDel);
     }
+    else if(nodeType(n2) == 3){
+      printf("youhoqsdfqsdfuyyyy\n");
+
+      nodeToDel = n2;
+
+      n1->V[1] = c->V[pivot];
+      n1->V[2] = n2->V[0];
+      c->V[pivot] = n2->V[1];
+      n1->p[2] = n2->p[0];
+      n1->p[3] = n2->p[1];
+      c->p[pivot+1] = n2->p[2];
+
+      backToStack(nodeToDel);
+    }
+    else if(nodeType(n2) == 4){
+      nodeToDel = n2;
+
+      n1->V[1] = c->V[pivot];
+      n1->V[2] = n2->V[0];
+      c->V[pivot] = n2->V[1];
+
+      n1->p[2] = n2->p[0];
+      n1->p[3] = n2->p[1];
+      if (pivot == 1)
+      {
+        /*move the values to the right if it's the p0 case*/
+        c->p[3] = c->p[2];
+        c->V[2] = c->V[1];
+      }
+
+      c->V[pivot+1] = n2->V[2];
+      c->p[pivot+1] = n2->p[2];
+      c->p[pivot+2] = n2->p[3];
+
+      backToStack(nodeToDel);
+    }
+    break;
+  case 4:
+    if(nodeType(n2) == 2  && pivot == 3){
+        /*TODO check this (tired)*/
+        /*probably the wrong direction*/
+        nodeToDel = n2;
+
+        n1->V[1] = n1->V[0];
+        n1->p[2] = n1->p[1];
+        n1->p[1] = n1->p[0];
+
+        n1->V[0] = c->V[pivot-1];
+        n1->p[0] = n2->p[1];
+        c->V[pivot-1] = n2->V[0];
+        c->p[2] = n2->p[0];
+        backToStack(nodeToDel);
+      }
+    else if(nodeType(n2) == 3  && pivot == 3){
+      /*TODO check this (tired)*/
+      /*same, probably wrong dir*/
+      nodeToDel = n2;
+
+      n1->V[2] = n1->V[0];
+      n1->p[3] = n1->p[0];
+      n1->p[2] = n1->p[1];
+
+      n1->V[1] = c->V[pivot-1];
+      n1->V[0] = n2->V[1];
+      n1->p[0] = n2->p[1];
+
+      n1->p[1]= n2->p[2];
+      c->V[pivot-1] = n2->V[0];
+      c->p[2] = n2->p[0];
+
+      backToStack(nodeToDel);
+    }
+    else if(nodeType(n2) == 4 && pivot == 3){
+      /*TODO*/
+      /*not the motivation to do it*/
+    }
+    else if(nodeType(n2) == 2 ){
+      nodeToDel = n2;
+
+      n1->V[1] = c->V[pivot];
+      c->V[pivot] = n2->V[0];
+      n1->p[2] = n2->p[0];
+      c->p[pivot+1] = n2->p[1];
+
+      backToStack(nodeToDel);
+    }
+    else if(nodeType(n2) == 3 ){
+      nodeToDel = n2;
+
+      n1->V[1] = c->V[pivot];
+      n1->V[2] = n2->V[0];
+      c->V[pivot] = n2->V[1];
+      n1->p[2] = n2->p[0];
+      n1->p[3] = n2->p[1];
+      c->p[pivot+1] = n2->p[2];
+
+      backToStack(nodeToDel);
+    }
+    
+    break;
+  default:
+    break;
   }
+  
+  // if (nodeType(n2)==2)
+  // { 
+  //   /* ici on sait que n1 et n2 sont des 2nodes */
+  //   /*put values in n1 */
+  //   n1->V[1] = c->V[pivot];
+  //   c->V[pivot] = 
+  //   n1->V[2] = n2->V[0]; 
+  //   n1->p[2] = n2->p[0];
+  //   n1->p[3] = n2->p[1];
+  //   /*put the empty node back to the stack (n2)*/
+  //   // TODO put back to S (don't know how)
+  //   n2->V[0].a = 0 ;
+  //   n2->V[0].b = 0 ;
+  //   n2->p[2] = NULL ;
 
-  else if(is3node(n2)){
+  //   n2->p[3] = S ;
+  //   S = n2 ;
+  //   /* change values and pointers of c*/
+  //   switch (pivot)
+  //   {
+  //   case 0 :
+  //     c->V[0] = c->V[1]; c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
+  //     c->p[1] = c->p[2]; c->p[2] = c->p[3]; c->p[3] = NULL;
+  //     break;
+  //   case 1 :
+  //     c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
+  //     c->p[2] = c->p[3]; c->p[3] = NULL;
+  //     break;
+  //   case 2:
+  //     c->V[2].a = 0; c->V[2].b = 0;
+  //     c->p[3] = NULL;
+  //     break;
+  //   default:
+  //     break;
+  //   }
+  // }
 
-  }
+  // else if(nodeType(n2) == 3){
+  //   printf("main join n1=1 n2=3\n");
+  //     nodeToDel = c->p[1];
 
-  else if(is4node(n2)){
+  //     c->p[0]->V[2] = c->V[0];
+  //     c->V[0] = c->p[1]->V[0];
+  //     c->V[1] = c->p[1]->V[1];
+  //     c->V[2] = c->p[1]->V[2];
 
-  }
+  //     c->p[0]->p[3] = c->p[1]->p[0];
+  //     c->p[2] = c->p[1]->p[2];
+  //     c->p[3] = c->p[1]->p[3];
+  //     c->p[1] = c->p[1]->p[1];
+
+  //     backToStack(nodeToDel);
+  // }
+
+  // else if(nodeType(n2) == 4){
+  //     printf("main join n1=1 n2=4\n");      
+  //     nodeToDel = c->p[1];
+
+  //     c->p[0]->V[2] = c->V[0];
+  //     c->V[0] = c->p[1]->V[0];
+  //     c->V[1] = c->p[1]->V[1];
+  //     c->V[2] = c->p[1]->V[2];
+
+  //     c->p[0]->p[3] = c->p[1]->p[0];
+  //     c->p[2] = c->p[1]->p[2];
+  //     c->p[3] = c->p[1]->p[3];
+  //     c->p[1] = c->p[1]->p[1];
+
+  //     backToStack(nodeToDel);
+  // }
 }
 
 int insert(struct frac f){
@@ -487,7 +653,7 @@ int insert(struct frac f){
     int inserted = 0;
     struct node234 *current_node = root;
     /*root is current_node because before the while loop*/
-    if(is4node(current_node)){
+    if(nodeType(current_node) == 4){
       printf("Spliting node %d\n", ptr2loc(current_node));
 
       root = S;
@@ -529,7 +695,7 @@ int insert(struct frac f){
         then split if it's 4 node and redo the loop. 
         Insert inside only leaf nodes. */
       if(compare_frac(f, current_node->V[0]) == -1){  /* navigate down p0 */
-        if(is4node(current_node->p[0])){ 
+        if(nodeType(current_node->p[0]) == 4){ 
           printf("Spliting node %d\n", ptr2loc(current_node->p[0]));
           splitNode(current_node, 0);
           continue;                       
@@ -547,7 +713,7 @@ int insert(struct frac f){
       
  
       else if(compare_frac(f, current_node->V[1]) == -1){ /* Navigate down p1*/
-        if(is4node(current_node->p[1])){ 
+        if(nodeType(current_node->p[1]) == 4){ 
           printf("Spliting node %d\n", ptr2loc(current_node->p[1]));
           splitNode(current_node, 1);
           continue;                        
@@ -563,7 +729,7 @@ int insert(struct frac f){
       } 
       
       else if(compare_frac(f, current_node->V[2]) == -1){    /* navigate down p2*/
-        if(is4node(current_node->p[2])){ 
+        if(nodeType(current_node->p[2]) == 4){ 
           printf("Spliting node %d\n", ptr2loc(current_node->p[2]));
           splitNode(current_node, 2);
           continue;
@@ -606,12 +772,15 @@ int deleteFromLeaf(struct frac f, struct node234 *leaf) {
 }
 
 struct frac findSuccessor(int pos, struct node234 *search_current){
+  struct node234 *next ;
   int leafIs2node;
   struct frac successor;
+
+  next = search_current->p[pos+1] ;
   while(!isLeaf(search_current)){
           search_current = search_current->p[0];
-        }
-        leafIs2node = is2node(search_current);
+        }        
+        leafIs2node = nodeType(search_current)==2;
         successor = search_current->V[0];
         deleteFromLeaf(search_current->V[0], search_current);
 
@@ -629,9 +798,9 @@ int deleteFromInternalNode(struct frac f, struct node234 *c) {
   struct frac successor;
   node234 search_current = c;
   printf("Deleting %llu/%llu from internal node %d at position %d\n", f.a, f.b, ptr2loc(c), pos);
-  
-  successor = findSuccessor(pos, c->p[pos]);
-  printf("successor found : %d/%d \n",successor.a, successor.b);
+
+  successor = findSuccessor(pos, c);
+  printf("successor found : %llu/%llu \n",successor.a, successor.b);
 
   c->V[pos] = successor; /*we delete the successor in the findSucessor function*/
   
@@ -644,34 +813,143 @@ int delete(struct frac f){
   int index = searchFrac(f);
   int deleted = 0;
   struct node234 *c = root;
-  printf("___Deleting %llu/%llu\n", f.a, f.b);
+  struct node234* nodeToDel ;
+  int i;
+
+  if(nodeType(c)==2){
+    /*the case where the root is a 2 node*/
+    printf("Joining nodes %d %d", ptr2loc(c->p[0]), ptr2loc(c->p[1]));
+    
+    switch (nodeType(c->p[0])) /*we check the case of p0, that changes the way of doing the join*/
+    {
+    case 2 :
+      if(nodeType(c->p[1]) == 2){
+        root = c->p[0];
+        root->V[1] = c->V[0];
+        root->V[2] = c->p[1]->V[0];
+        root->p[2] = c->p[1]->p[0];
+        root->p[3] = c->p[1]->p[1];
+
+        backToStack(c->p[1]);
+        backToStack(c);
+      }
+      if(nodeType(c->p[1]) == 3){
+        nodeToDel = c->p[1];
+
+        c->p[0]->V[1] = c->V[0];
+        c->p[0]->p[2] = c->p[1]->p[0]; 
+        c->V[0] = c->p[1]->V[0]; 
+        c->V[1] = c->p[1]->V[1];
+        c->p[2] = c->p[1]->p[2]; 
+        c->p[1] = c->p[1]->p[1];
+
+        backToStack(nodeToDel);
+      }
+      if(nodeType(c->p[1]) == 4){
+        nodeToDel = c->p[1];
+
+        c->p[0]->V[1] = c->V[0];
+        c->p[0]->V[2] = c->p[1]->V[0];
+        c->p[0]->p[2] = c->p[1]->p[0];
+        c->p[0]->p[3] = c->p[1]->p[1];
+        c->V[0] = c->p[1]->V[1]; 
+        c->V[1] = c->p[1]->V[2];
+
+        c->p[2] = c->p[1]->p[3]; 
+        c->p[1] = c->p[1]->p[2];
+
+        backToStack(nodeToDel);
+      }
+      break;
+    case 3 :
+    if(nodeType(c->p[1]) == 2){
+      nodeToDel = c->p[1];
+
+      c->V[1] =  c->p[1]->V[0];
+      c->p[2] = c->p[1]->p[1];
+      c->p[1] = c->p[1]->p[0];
+
+      backToStack(nodeToDel);
+    }
+    else{
+      printf("chirurgical p0=3 p1=3\n");
+      nodeToDel = c->p[1];
+
+      c->p[0]->V[2] = c->V[0];
+      c->V[0] = c->p[1]->V[0];
+      c->V[1] = c->p[1]->V[1];
+      c->V[2] = c->p[1]->V[2];
+
+      c->p[0]->p[3] = c->p[1]->p[0];
+      c->p[2] = c->p[1]->p[2];
+      c->p[3] = c->p[1]->p[3];
+      c->p[1] = c->p[1]->p[1];
+
+      backToStack(nodeToDel);
+    }
+      break;
+    case 4 :
+      if(nodeType(c->p[1])==2){
+        c->V[1] = c->p[1]->V[0];
+        c->p[2] = c->p[1]->p[1]; c->p[1]->p[1] = NULL;
+        c->p[1]->p[3] = S;
+        S = c->p[1];
+        c->p[1] = c->p[1]->p[0];
+        S->p[0] = NULL; 
+      }
+      else if(nodeType(c->p[1])==3){
+        printf("chirurgical p0=4 p1=3\n");
+
+        c->V[1] = c->p[1]->V[0]; 
+        c->p[2] = c->p[1];
+        c->p[1] = c->p[1]->p[0]; 
+        
+        c->p[2]->V[0] = c->p[2]->V[1];
+        c->p[2]->p[0] = c->p[2]->p[1];
+        c->p[2]->p[1] = c->p[2]->p[2];
+        c->p[2]->p[2] = NULL;
+
+        c->p[2]->V[1].a = 0;
+        c->p[2]->V[1].b = 0;
+      }
+      else if(nodeType(c->p[1])==4){
+        splitNode(c, 1);
+      }
+      break;
+    default:
+      break;
+    }
+    c = root;
+  }
 
   while(!deleted){
-    if (compare_frac(f, c->V[0]) == -1){ /*move to p0*/
-      if(is2node(c->p[0])){ /*p0 is a 2-node*/
-        /*check for sibling in p[1], otherwhise take p[2] ?*/ /*TO CHECK*/
-        /*p[1] should always exist*/
-        joinNode(0, c, c->p[0], c->p[1]);
-      }
+    if (compare_frac(f, c->V[0]) == -1){i = 0;}
+    else if (compare_frac(f, c->V[1]) == -1){i = 1;}
+    else if (compare_frac(f, c->V[2]) == -1){i = 2;}
+    else{i = 3;}
 
-      c = c->p[0];
+    if(nodeType(c->p[i]) == 2){
+      joinNode(i, c);
+    }
+    
+    // showNode(c);
+    c = c->p[i];
+    // showNode(c);
 
-      if (isFracInNode(f, c))
-      {
-        printf("Found %llu/%llu in node %d\n", f.a, f.b, ptr2loc(c));
-        if (isLeaf(c)) {
-          index = deleteFromLeaf(f, c);
-          deleted = 1;
-        } 
-        
-        else { 
-          index = deleteFromInternalNode(f, c);
-          deleted = 1;
-        }
+    if (isFracInNode(f, c))
+    {
+      // printf("Found %llu/%llu in node %d\n", f.a, f.b, ptr2loc(c));
+      if (isLeaf(c)) {
+        index = deleteFromLeaf(f, c);
+        deleted = 1;
+      } 
+      
+      else { 
+        index = deleteFromInternalNode(f, c);
+        deleted = 1;
       }
     }
   }
-
   return index;
 }
 
