@@ -442,13 +442,16 @@ void joinNode(int pivot, node234 c){
   {
     n1 = c->p[pivot];  /*always 2node*/
     n2 = c->p[pivot+1]; /*check the case of n2*/
+    printf("Joining nodes %d %d\n", ptr2loc(n1), ptr2loc(n2));
+
   }
   else{
     n2 = c->p[pivot-1];  /*the case where we have to join p3*/
     n1 = c->p[pivot]; 
+    printf("Joining nodes %d %d\n", ptr2loc(n2), ptr2loc(n1));
+
   }
-  
-  printf("Joining nodes %d %d \n", ptr2loc(n1), ptr2loc(n2));
+
   switch (nodeType(c))
   {
   case 3 :
@@ -464,8 +467,6 @@ void joinNode(int pivot, node234 c){
       backToStack(nodeToDel);
     }
     else if(nodeType(n2) == 3){
-      printf("youhoqsdfqsdfuyyyy\n");
-
       nodeToDel = n2;
 
       n1->V[1] = c->V[pivot];
@@ -566,77 +567,6 @@ void joinNode(int pivot, node234 c){
   default:
     break;
   }
-  
-  // if (nodeType(n2)==2)
-  // { 
-  //   /* ici on sait que n1 et n2 sont des 2nodes */
-  //   /*put values in n1 */
-  //   n1->V[1] = c->V[pivot];
-  //   c->V[pivot] = 
-  //   n1->V[2] = n2->V[0]; 
-  //   n1->p[2] = n2->p[0];
-  //   n1->p[3] = n2->p[1];
-  //   /*put the empty node back to the stack (n2)*/
-  //   // TODO put back to S (don't know how)
-  //   n2->V[0].a = 0 ;
-  //   n2->V[0].b = 0 ;
-  //   n2->p[2] = NULL ;
-
-  //   n2->p[3] = S ;
-  //   S = n2 ;
-  //   /* change values and pointers of c*/
-  //   switch (pivot)
-  //   {
-  //   case 0 :
-  //     c->V[0] = c->V[1]; c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
-  //     c->p[1] = c->p[2]; c->p[2] = c->p[3]; c->p[3] = NULL;
-  //     break;
-  //   case 1 :
-  //     c->V[1] = c->V[2]; c->V[2].a = 0; c->V[2].b = 0;
-  //     c->p[2] = c->p[3]; c->p[3] = NULL;
-  //     break;
-  //   case 2:
-  //     c->V[2].a = 0; c->V[2].b = 0;
-  //     c->p[3] = NULL;
-  //     break;
-  //   default:
-  //     break;
-  //   }
-  // }
-
-  // else if(nodeType(n2) == 3){
-  //   printf("main join n1=1 n2=3\n");
-  //     nodeToDel = c->p[1];
-
-  //     c->p[0]->V[2] = c->V[0];
-  //     c->V[0] = c->p[1]->V[0];
-  //     c->V[1] = c->p[1]->V[1];
-  //     c->V[2] = c->p[1]->V[2];
-
-  //     c->p[0]->p[3] = c->p[1]->p[0];
-  //     c->p[2] = c->p[1]->p[2];
-  //     c->p[3] = c->p[1]->p[3];
-  //     c->p[1] = c->p[1]->p[1];
-
-  //     backToStack(nodeToDel);
-  // }
-
-  // else if(nodeType(n2) == 4){
-  //     printf("main join n1=1 n2=4\n");      
-  //     nodeToDel = c->p[1];
-
-  //     c->p[0]->V[2] = c->V[0];
-  //     c->V[0] = c->p[1]->V[0];
-  //     c->V[1] = c->p[1]->V[1];
-  //     c->V[2] = c->p[1]->V[2];
-
-  //     c->p[0]->p[3] = c->p[1]->p[0];
-  //     c->p[2] = c->p[1]->p[2];
-  //     c->p[3] = c->p[1]->p[3];
-  //     c->p[1] = c->p[1]->p[1];
-
-  //     backToStack(nodeToDel);
-  // }
 }
 
 int insert(struct frac f){
@@ -809,37 +739,29 @@ int deleteFromInternalNode(struct frac f, struct node234 *c) {
   return ptr2loc(c);
 }
 
-int delete(struct frac f){
-  int index = searchFrac(f);
-  int deleted = 0;
-  struct node234 *c = root;
-  struct node234* nodeToDel;
-  int i;
-  
+struct node234* rootJoinCase(node234 c){
   if(nodeType(c)==2){
     /*the case where the root is a 2 node*/
     /*REDO it's most likely buggy*/
+    struct node234* nodeToDel;
     printf("Joining nodes %d %d\n", ptr2loc(c->p[0]), ptr2loc(c->p[1]));
-    showNode(c);
-    showNode(c->p[0]);
-    showNode(c->p[1]);
 
     switch (nodeType(c->p[0])) /*we check the case of p0, that changes the way of doing the join*/
     {
     case 2 :
       if(nodeType(c->p[1]) == 2){
         nodeToDel = c->p[1];
-
         root = c->p[0];
         root->V[1] = c->V[0];
         root->V[2] = c->p[1]->V[0];
         root->p[2] = c->p[1]->p[0];
         root->p[3] = c->p[1]->p[1];
 
-        backToStack(c->p[1]);
+        backToStack(nodeToDel);
         backToStack(c);
+        c = root;
       }
-      if(nodeType(c->p[1]) == 3){
+      else if(nodeType(c->p[1]) == 3){
         nodeToDel = c->p[1];
 
         c->p[0]->V[1] = c->V[0];
@@ -851,7 +773,7 @@ int delete(struct frac f){
 
         backToStack(nodeToDel);
       }
-      if(nodeType(c->p[1]) == 4){
+      else if(nodeType(c->p[1]) == 4){
         nodeToDel = c->p[1];
 
         c->p[0]->V[1] = c->V[0];
@@ -925,8 +847,18 @@ int delete(struct frac f){
     default:
       break;
     }
-    c = root;
   }
+  return root;
+}
+
+int delete(struct frac f){
+  int index = searchFrac(f);
+  int deleted = 0;
+  struct node234 *c = root;
+  struct node234* nodeToDel;
+  int i;
+  
+  c = rootJoinCase(c);
 
   while(!deleted){
     if (compare_frac(f, c->V[0]) == -1){i = 0;}
@@ -934,15 +866,20 @@ int delete(struct frac f){
     else if (compare_frac(f, c->V[2]) == -1){i = 2;}
     else{i = 3;}
 
-    if(nodeType(c->p[i]) == 2){
+    showNode(c);
+    showNode(c->p[2]);
+    
+
+    if(nodeType(c->p[i]) == 2 && !isLeaf(c->p[i])){
       joinNode(i, c);
     }
     
-    // showNode(c);
-    c = c->p[i];
-    
-    // showNode(c);
 
+    c = c->p[i];
+    // showNode(root->p[0]); /*18*/
+    // showNode(root->p[0]->p[1]); /*8*/
+    // showNode(root->p[0]->p[2]); /*16*/
+    // showNode(c);
     if (isFracInNode(f, c))
     {
       // printf("Found %llu/%llu in node %d\n", f.a, f.b, ptr2loc(c));
