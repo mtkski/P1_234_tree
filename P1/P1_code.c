@@ -857,6 +857,7 @@ int delete(struct frac f){
   struct node234 *c = root;
   struct node234* nodeToDel;
   int i;
+  if (searchFrac(f) == -1){return -1;}
   
   c = rootJoinCase(c);
 
@@ -866,9 +867,6 @@ int delete(struct frac f){
     else if (compare_frac(f, c->V[2]) == -1){i = 2;}
     else{i = 3;}
 
-    showNode(c);
-    showNode(c->p[2]);
-    
 
     if(nodeType(c->p[i]) == 2 && !isLeaf(c->p[i])){
       joinNode(i, c);
@@ -896,7 +894,6 @@ int delete(struct frac f){
   }
   return index;
 }
-
 
 int main(void){
   
