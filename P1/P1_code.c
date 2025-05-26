@@ -813,17 +813,23 @@ int delete(struct frac f){
   int index = searchFrac(f);
   int deleted = 0;
   struct node234 *c = root;
-  struct node234* nodeToDel ;
+  struct node234* nodeToDel;
   int i;
-
+  
   if(nodeType(c)==2){
     /*the case where the root is a 2 node*/
-    printf("Joining nodes %d %d", ptr2loc(c->p[0]), ptr2loc(c->p[1]));
-    
+    /*REDO it's most likely buggy*/
+    printf("Joining nodes %d %d\n", ptr2loc(c->p[0]), ptr2loc(c->p[1]));
+    showNode(c);
+    showNode(c->p[0]);
+    showNode(c->p[1]);
+
     switch (nodeType(c->p[0])) /*we check the case of p0, that changes the way of doing the join*/
     {
     case 2 :
       if(nodeType(c->p[1]) == 2){
+        nodeToDel = c->p[1];
+
         root = c->p[0];
         root->V[1] = c->V[0];
         root->V[2] = c->p[1]->V[0];
@@ -934,6 +940,7 @@ int delete(struct frac f){
     
     // showNode(c);
     c = c->p[i];
+    
     // showNode(c);
 
     if (isFracInNode(f, c))
