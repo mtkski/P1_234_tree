@@ -438,19 +438,39 @@ void joinNode(int pivot, node234 c){
   struct node234 *n2;
   struct node234 *nodeToDel ;
 
-  if (pivot != 3)
+  char txt[100];
+  
+  if (c->p[pivot+1] != NULL)     // if there is a node to the right
   {
     n1 = c->p[pivot];  /*always 2node*/
     n2 = c->p[pivot+1]; /*check the case of n2*/
-    printf("Joining nodes %d %d\n", ptr2loc(n1), ptr2loc(n2));
+  
+    snprintf(txt, sizeof(txt), "Joining nodes %d %d\n", ptr2loc(n1), ptr2loc(n2));
+
 
   }
-  else{
-    n2 = c->p[pivot-1];  /*the case where we have to join p3*/
+  else{                         // otherwise we join with the node to the left
+    n2 = c->p[pivot-1];  
     n1 = c->p[pivot]; 
-    printf("Joining nodes %d %d\n", ptr2loc(n2), ptr2loc(n1));
+    
+    snprintf(txt, sizeof(txt), "Joining nodes %d %d\n", ptr2loc(n2), ptr2loc(n1));
 
   }
+
+  if (nodeType(n2) == 4){     // spec. case: can't join nodes because n2 is full (i.e. a 4-node), rotate values instead
+    
+    n1->V[1] = c->V[1];
+    c->V[1] = n2->V[0];
+    n2->V[0] = n2->V[1];
+    n2->V[1] = n2->V[2];
+    
+    n2->V[2].a = 0;
+    n2->V[2].b = 0;
+    return;
+
+  }
+
+  printf("%s", txt);
 
   switch (nodeType(c))
   {
@@ -478,7 +498,7 @@ void joinNode(int pivot, node234 c){
 
       backToStack(nodeToDel);
     }
-    else if(nodeType(n2) == 4){
+    else if(nodeType(n2) == 4){       // remove?, all cases of nodeType(n2) == 4 handled above i think
       nodeToDel = n2;
 
       n1->V[1] = c->V[pivot];
@@ -536,9 +556,9 @@ void joinNode(int pivot, node234 c){
 
       backToStack(nodeToDel);
     }
-    else if(nodeType(n2) == 4 && pivot == 3){
+    else if(nodeType(n2) == 4 && pivot == 3){       // remove? all cases of nodeType(n2) == 4 handled above i think
       /*TODO*/
-      /*not the motivation to do it*/
+      /*not the motivation to do it*/ 
     }
     else if(nodeType(n2) == 2 ){
       nodeToDel = n2;
@@ -868,9 +888,9 @@ int delete(struct frac f){
     else{i = 3;}
 
 
-    if(nodeType(c->p[i]) == 2 && !isLeaf(c->p[i])){
+    if(nodeType(c->p[i]) == 2){
       joinNode(i, c);
-    }
+    } 
     
 
     c = c->p[i];
