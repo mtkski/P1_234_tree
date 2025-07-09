@@ -63,14 +63,14 @@ void shownode(node v)
 
 int descendQ(point p, char t){ 
 
-    if (p->a == p->b ){                  /* if we are in a node or about to enter a node then check child then brothers */
+    if (p->a == p->b){                  /* if we are in a node or about to enter a node then check child then brothers */
 
         node bro = p->b->child;
         char next;
         
         while (bro != NULL){
 
-            next = T[bro->head + p->b->sdep];
+            next = T[bro->head + p->a->sdep];
             
             if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
                 return 1;
@@ -85,7 +85,7 @@ int descendQ(point p, char t){
 
     } else {                            /* if we are in an edge then check next character */
         
-        return T[p->a->sdep + p->s] == t;
+        return T[p->b->head + p->a->sdep + p->s] == t;
     }
 
 }
@@ -99,7 +99,7 @@ void descend(point p, char t){
         
         while(bro != NULL){
             
-            next = T[bro->head + p->b->sdep];
+            next = T[bro->head + p->a->sdep];
             
             if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
                 p->a = bro;
@@ -116,7 +116,7 @@ void descend(point p, char t){
 
     }
     
-    if(p->s + 1 == p->b->sdep){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
+    if(p->s + 1 == (p->b->sdep - p->a->sdep)){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
         p->a = p->b;
         p->s = 0;
 
@@ -223,10 +223,11 @@ void suffixLink(point p, int a, int j, int i){
         p->b = &root[0];
         p->s = 0;
 
-        while (p->s < s){               /* descend path to end of same substring with diff start */
+        while (p->a->sdep + p->s < s){               /* descend path to end of same substring with diff start */
             descend(p, T[path]);
             path++;
         }
+        
     }
 
 }
