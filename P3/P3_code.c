@@ -63,14 +63,14 @@ void shownode(node v)
 
 int descendQ(point p, char t){ 
 
-    if (p->a == p->b){                  /* if we are in a node then check child then brothers */
+    if (p->a == p->b ){                  /* if we are in a node or about to enter a node then check child then brothers */
 
         node bro = p->b->child;
         char next;
         
         while (bro != NULL){
 
-            next = T[bro->head];
+            next = T[bro->head + p->b->sdep];
             
             if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
                 return 1;
@@ -85,7 +85,7 @@ int descendQ(point p, char t){
 
     } else {                            /* if we are in an edge then check next character */
         
-        return T[p->b->head + p->s] == t;
+        return T[p->a->sdep + p->s] == t;
     }
 
 }
@@ -99,7 +99,7 @@ void descend(point p, char t){
         
         while(bro != NULL){
             
-            next = T[bro->head];
+            next = T[bro->head + p->b->sdep];
             
             if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
                 p->a = bro;
@@ -153,7 +153,7 @@ int addLeaf(point p, int a, int j, int i){
         node N = &(root[a+1]);
 
         internal->head = p->b->head;
-        internal->sdep = p->s;
+        internal->sdep = p->a->sdep + p->s;
         
 
         *(p->b->hook) = internal;
@@ -179,7 +179,7 @@ int addLeaf(point p, int a, int j, int i){
         N->brother = p->b;
 
         N->head = j;
-        N->sdep = i - j + 1;
+        N->sdep = internal->sdep + (n - i) + 1;
 
         newInternal = internal;
         
@@ -191,10 +191,10 @@ int addLeaf(point p, int a, int j, int i){
 
 }
 
-void suffixLink(point p){
+void suffixLink(point p, int a, int j, int i){
 
-    int path = p->b->head + 1;
-    int s = p->s - 1;
+    int path = j + 1;
+    int s = p->a->sdep + p->s - 1;
 
     if (lastInternalCreated != NULL){
 
@@ -217,13 +217,13 @@ void suffixLink(point p){
         p->a = p->b->slink;
         p->b = p->b->slink;
 
-    } else {
-
+    } else {                            /* skip/count trick */
+        
         p->a = &root[0];                /* go to root */
         p->b = &root[0];
         p->s = 0;
 
-        while (p->s < s){
+        while (p->s < s){               /* descend path to end of same substring with diff start */
             descend(p, T[path]);
             path++;
         }
@@ -266,17 +266,17 @@ int main(void){
         printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);                                   
 
         if (!descendQ(p, T[i])){
-            printf("LZ-Block %.*s %c\n", p->s, T + j, '\0' == T[i] ? '$' : T[i]);  
+            printf("LZ-Block %.*s %c\n",  p->a->sdep + p->s, T + j, '\0' == T[i] ? '$' : T[i]);  
             LZ++;
         }
          
         while(!descendQ(p, T[i])) {                 /* check if we can descend with next character in T */                         
            
             a += addLeaf(p, a, j, i);
-            suffixLink(p);
+            suffixLink(p, a, j, i);
             j++;                                        /* next extension */
 
-            /*printf("\n  suffixLink moved p to:\n");
+            /*printf("\n  \033[1;32msuffixLink moved p to:\033[0m\n");
             shownode(p->a);
             shownode(p->b);
             printf("    %d\n\n", p->s);*/
@@ -286,7 +286,7 @@ int main(void){
         descend(p, T[i]);                           /* descend in tree */
         i++;                                            /* next phase */
 
-        /*printf("\n  descend moved p to:\n");
+        /*printf("\n  \033[1;32mdescend moved p to:\033[0m\n");
         shownode(p->a);
         shownode(p->b);
         printf("    %d\n\n", p->s);*/
