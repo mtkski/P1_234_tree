@@ -13,7 +13,8 @@ node root;           /* root node */
 char *T;
 point p;
 
-/* lastInternalCreated (global variable to be implemented last) */
+node lastInternalCreated; /*global variable to be implemented last*/
+node newInternal;
 
 struct point {
     node a; /**< node above */
@@ -63,7 +64,7 @@ void shownode(node v)
 int descendQ(point p, char t){ 
 
     if (p->a == p->b){                  /* if we are in a node then check child then brothers */
-        
+
         node bro = p->b->child;
         char next;
         
@@ -72,9 +73,9 @@ int descendQ(point p, char t){
             next = T[bro->head];
             
             if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
-                return true;
+                return 1;
             } else if (next == t){         /* next head is t, i.e we can descend with t */
-                return true;
+                return 1;
             } else {
                 bro = bro->brother;        /* check brothers */
             }
@@ -92,32 +93,54 @@ int descendQ(point p, char t){
 void descend(point p, char t){
 
     if (p->a == p->b){               /* if we are in a node, set b to next node */
-        p->b = p->b->child;          
+        
+        node bro = p->b->child;
+        char next;
+        
+        while(bro != NULL){
+            
+            next = T[bro->head];
+            
+            if(bro->sdep == 0){           /* next is the root and we are in the sentinel */
+                p->a = bro;
+                p->b = bro;
+                p->s = 0;
+                break;
+            } else if(next == t){
+                p->b = bro;
+                break;
+            } else {
+                bro = bro->brother;
+            }
+        }
+
     }
     
-    if(p->s + 1 == p->b->sdep || p->b->sdep == 0){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
-
+    if(p->s + 1 == p->b->sdep){      /* if we are at the end of a branch (??? condition might be wrong) or next node is root): move to next node */
         p->a = p->b;
         p->s = 0;
 
-    } else {                         /* else if we are in the middle of a branch: increment string depth, move forward in branch */
+    } else if (p->a != p->b) {                         /* else if we are in the middle of a branch: increment string depth, move forward in branch */
         p->s += 1;
     }
 }
 
 
-int addLeaf(point p, int a, int j){
+int addLeaf(point p, int a, int j, int i){
 
-    node N = &(root[a]);
+    if (p->a == p->b){                              /* if p is inside node we need to add a leaf with missing path label T[i]*/
+        node N = &(root[a]);
+        
+        if (p->b->child){                           /* if there are already children then rearange so new leaf is first in linked list*/
+            p->b->child->hook = &(N->brother);
+            N->brother = p->b->child; 
+        }
+        
+        p->b->child = N;
+        N->hook = &(p->b->child);
 
-    if (p->a == p->b){
-
-        p->a->child = N;
-
-        N->head = j;
-        N->child = NULL;
-        N->slink = NULL;    
-        N->sdep = n + 1 - N->head;
+        N->head = i;  
+        N->sdep = n + 1 - i;
 
         printf("Leaf ");
         shownode(N);
@@ -126,20 +149,40 @@ int addLeaf(point p, int a, int j){
 
     } else {
         
-        node internal = &(root[a+1]);
+        node internal = &(root[a]);       
+        node N = &(root[a+1]);
 
         internal->head = p->b->head;
-        p->a->child = internal;
-        /* internal->child = p->b; */
-        internal->child = N;
         internal->sdep = p->s;
+        
 
-        N->head = j;
-        N->brother = p->b;
-        N->sdep = n + 1 - N->head;
+        *(p->b->hook) = internal;
+        internal->hook = p->b->hook;
+
+       
+        internal->child = p->b;
+        internal->brother = p->b->brother;
+
+
+        if(internal->brother){
+            *(internal->brother->hook) = NULL;
+            internal->brother->hook = &internal->brother;
+        } 
 
         printf("Internal ");
         shownode(internal);
+        
+        N->hook = &(internal->child);
+        internal->child = N;
+ 
+        p->b->hook = &(N->brother);
+        N->brother = p->b;
+
+        N->head = j;
+        N->sdep = i - j + 1;
+
+        newInternal = internal;
+        
         printf("Leaf ");
         shownode(N);
 
@@ -150,9 +193,41 @@ int addLeaf(point p, int a, int j){
 
 void suffixLink(point p){
 
-    if (p->a == p->b && p->a->child == NULL){
-        p->a->slink;
-    } // ???
+    int path = p->b->head + 1;
+    int s = p->s - 1;
+
+    if (lastInternalCreated != NULL){
+
+        if (lastInternalCreated != newInternal){
+            lastInternalCreated->slink = newInternal;
+        } else {
+            lastInternalCreated->slink = &(root[0]);
+        }
+
+        if(newInternal->sdep == p->s){          /* enter node */
+            p->a = newInternal;
+            p->b = newInternal;
+            p->s = 0;
+        }
+    } 
+
+    lastInternalCreated = newInternal;
+
+    if(p->b->slink){
+        p->a = p->b->slink;
+        p->b = p->b->slink;
+
+    } else {
+
+        p->a = &root[0];                /* go to root */
+        p->b = &root[0];
+        p->s = 0;
+
+        while (p->s < s){
+            descend(p, T[path]);
+            path++;
+        }
+    }
 
 }
 
@@ -161,42 +236,63 @@ void suffixLink(point p){
 
 int main(void){
     
-    int j;
-    int i = 0;              /* position in string T */
+    int j = 0;              /* start index of substring */
+    int i = 0;              /* end index of subtring*/
     int a = 2;              /* position in root array, start after root node and sentinel */
+    int LZ = 0;
+    char format[10];                /* format string: only scan n characters into T */
 
-    scanf("%d", &n);
+    scanf("%d", &n);        
     
     T = (char*)malloc(n*sizeof(char));
-    scanf("%s", T);     
+    
+    sprintf(format, "%%%ds", n);  
+    scanf(format, T);     
 
     root = calloc(n + 2, sizeof(struct node)); /* Whole size of the tree */
     p = (point)malloc(sizeof(struct point));
     
     root[0].slink = &root[1];       /* the slink of the root is the sentinel */
     root[1].child = &root[0];       /* we can descend from the sentinel to the root */
+    root[0].sdep = 0;
     root[1].sdep = -1;
     
-    p->a = &root[i];                /* go to root */
-    p->b = &root[i];
+    p->a = &root[0];                /* go to root */
+    p->b = &root[0];
     p->s = 0;
 
-    while(i < n + 1) {
+    while(i < n + 1) {                                  /* i is end index of substring */
 
-        printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);
+        printf("Letter %c\n", '\0' == T[i] ? '$' : T[i]);                                   
 
-        j = i;
-        
-        while(!descendQ(p, T[i])) {
-            a += addLeaf(p, a, j);
+        if (!descendQ(p, T[i])){
+            printf("LZ-Block %.*s %c\n", p->s, T + j, '\0' == T[i] ? '$' : T[i]);  
+            LZ++;
+        }
+         
+        while(!descendQ(p, T[i])) {                 /* check if we can descend with next character in T */                         
+           
+            a += addLeaf(p, a, j, i);
             suffixLink(p);
-            j++;
+            j++;                                        /* next extension */
+
+            /*printf("\n  suffixLink moved p to:\n");
+            shownode(p->a);
+            shownode(p->b);
+            printf("    %d\n\n", p->s);*/
+
         }
 
-        descend(p, T[i]);
-        i++;
+        descend(p, T[i]);                           /* descend in tree */
+        i++;                                            /* next phase */
+
+        /*printf("\n  descend moved p to:\n");
+        shownode(p->a);
+        shownode(p->b);
+        printf("    %d\n\n", p->s);*/
     }
 
+    printf("%d\n", LZ);
     printf("Final version\n");
     i = 0;
 
