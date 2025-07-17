@@ -154,14 +154,16 @@ int addLeaf(point p, int a, int j, int i){
         p->b->child = N;
         N->hook = &(p->b->child);
 
-        N->head = i;  
-        N->sdep = n + 1 - i;
+        N->head = i - p->b->sdep;  
+        N->sdep = n + 1 - i + p->b->sdep;
 
         printf("Leaf ");
         shownode(N);
 
         if(lastInternalCreated != NULL){
-            lastInternalCreated->slink = &(root[0]);
+            lastInternalCreated->slink = p->a;
+            /*printf("\n      addLeaf slinked: \n");
+            shownode(lastInternalCreated);*/
         }
 
         lastInternalCreated = NULL;
@@ -204,6 +206,8 @@ int addLeaf(point p, int a, int j, int i){
         
         if (lastInternalCreated != NULL) {
             lastInternalCreated->slink = internal;
+            /*printf("\n      addInternal slinked: \n");
+            shownode(lastInternalCreated);*/
         }
         
         lastInternalCreated = internal;
@@ -323,8 +327,10 @@ int main(void){
 
         }
         
-        if(lastInternalCreated != NULL && lastInternalCreated->slink == NULL){  /*  */
+        if(lastInternalCreated != NULL){  
             lastInternalCreated->slink = p->a;
+            /*printf("\n      main slinked: \n");
+            shownode(lastInternalCreated);*/
         }
 
         descend(p, T[i]);                               /* descend in tree */
