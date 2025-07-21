@@ -222,11 +222,9 @@ int addLeaf(point p, int a, int j, int i){
 
 void suffixLink(point p, int i){
 
-    int h = j;
-    int g = i - j + 1;
+    int h = j + p->a->sdep;
+    int g = i - j + 1 - p->a->sdep;
     int G;
-
-    int skip = p->a->sdep;
 
     if(p->a->slink){
         p->b = p->a->slink;
@@ -241,12 +239,6 @@ void suffixLink(point p, int i){
         
     }
 
-    if(p->a != &root[1]){
-        h = h + skip;
-        g = g - skip;
-    }
-    
-    
     findPath(p, T[h]);
     G = p->b->sdep - p->a->sdep;
 
@@ -294,7 +286,7 @@ int main(void){
     sprintf(format, "%%%ds", n);  
     scanf(format, T);     
 
-    root = calloc(n * 2 + 2, sizeof(struct node)); /* Whole size of the tree */
+    root = calloc(2*n + 2, sizeof(struct node)); /* Whole size of the tree */
     p = (point)malloc(sizeof(struct point));
     
     root[0].slink = &root[1];       /* the slink of the root is the sentinel */
@@ -353,6 +345,8 @@ int main(void){
         i++;
     }
 
-    printf("\n");
+    free(T);
+    free(root);
+    free(p);
 
 }
